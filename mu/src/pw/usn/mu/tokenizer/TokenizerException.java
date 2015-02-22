@@ -43,7 +43,7 @@ public class TokenizerException extends RuntimeException {
 		if(near == null) {
 			return String.format("%s (at %s)", super.getMessage(), location.toString());
 		} else {
-			return String.format("%s (at %s, near %s)", super.getMessage(), location.toString(), near);
+			return String.format("%s (at %s, near \"%s\")", super.getMessage(), location.toString(), near);
 		}
 	}
 }

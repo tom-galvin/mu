@@ -49,7 +49,7 @@ public class Tokenizer {
 			}
 			
 			if(!tokenEncountered) {
-				throw new TokenizerException("No token was matched.", source.getLocation(), source.getRemainderOfLine());
+				throw new TokenizerException("Unrecognized token.", source.getLocation(), source.getRemainderOfLine());
 			}
 		}
 		Token[] tokenArray = new Token[tokens.size()];

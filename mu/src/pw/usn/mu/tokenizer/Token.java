@@ -43,6 +43,16 @@ public abstract class Token {
 			return String.format("[%s %s=%s]", location.toString(), getClass().getSimpleName(), information);
 		}
 	}
+	
+	/**
+	 * Determines if this Token is a {@link SymbolToken} of the specified type.
+	 * @param type The type of symbol token to check for.
+	 * @return Returns {@code true} if this token is an instance of {@link SymbolToken}, and
+	 * {@link SymbolToken#getType()} equals {@code type}.
+	 */
+	public boolean isSymbolToken(SymbolTokenType type) {
+		return this instanceof SymbolToken && ((SymbolToken)this).getType().equals(type);
+	}
 
 	@Override
 	public int hashCode() {

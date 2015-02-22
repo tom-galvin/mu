@@ -11,4 +11,9 @@ public final class IgnoreToken extends Token {
 	public IgnoreToken(Location location) {
 		super(location);
 	}
+	
+	@Override
+	public boolean ignore() {
+		return true;
+	}
 }

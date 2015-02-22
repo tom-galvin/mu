@@ -48,4 +48,12 @@ public abstract class Token {
 	public int hashCode() {
 		return toString().hashCode();
 	}
+	
+	/**
+	 * Return whether to discard this token from the token list.
+	 * @return {@code true} to discard this token from the tokenized source; otherwise {@code false}.
+	 */
+	public boolean ignore() {
+		return false;
+	}
 }

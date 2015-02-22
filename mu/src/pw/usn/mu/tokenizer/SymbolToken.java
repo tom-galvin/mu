@@ -26,6 +26,6 @@ public class SymbolToken extends Token {
 	
 	@Override
 	public String getInformation() {
-		return type.toString();
+		return type.getDisplayString();
 	}
 }

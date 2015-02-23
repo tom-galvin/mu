@@ -50,7 +50,7 @@ public class LiteralInt implements Parsable {
 	}
 
 	@Override
-	public String toSource() {
+	public String toSource(int indentationLevel) {
 		return originalBase.toString(value);
 	}
 	

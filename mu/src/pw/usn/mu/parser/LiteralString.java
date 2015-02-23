@@ -29,7 +29,7 @@ public class LiteralString implements Parsable {
 	}
 	
 	@Override
-	public String toSource() {
+	public String toSource(int indentationLevel) {
 		return String.format("%s%s%s",
 				LITERAL_STRING_DELIMITER,
 				value,

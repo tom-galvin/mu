@@ -70,6 +70,22 @@ public class Parser {
 	}
 	
 	/**
+	 * Tests whether the token {@code lookahead}+1 ahead of the current token in the
+	 * token array satisfies the given condition. If there is no such token (ie. the
+	 * token would be after the end of the token array), then this function returns
+	 * {@code false}.
+	 * @param condition The condition that the token must satisfy.
+	 * @param lookahead The number of tokens to look ahead after the next token. A
+	 * value of {@code 0} indicates the next token. A value of {@code 1} indicates the
+	 * token after that, and so on.
+	 * @return Whether the given lookahead token exists, and if so, it satisfies {@code
+	 * condition}.
+	 */
+	public boolean test(Predicate<Token> condition, int lookahead) {
+		return !eof() && condition.test(tokens[index + 1]);
+	}
+	
+	/**
 	 * Tests whether the next token in the token array satisfies the given condition.
 	 * If there is no next token (ie. the parser is at the end of the token array), then
 	 * this function returns {@code false}.
@@ -77,7 +93,7 @@ public class Parser {
 	 * @return Whether the next token exists, and if so, it satisfies {@code condition}.
 	 */
 	public boolean test(Predicate<Token> condition) {
-		return !eof() && condition.test(tokens[index + 1]);
+		return test(condition, 0);
 	}
 	
 	/**

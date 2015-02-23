@@ -43,7 +43,7 @@ public class Identifier implements Parsable {
 	}
 
 	@Override
-	public String toSource() {
+	public String toSource(int indentationLevel) {
 		StringBuilder builder = new StringBuilder();
 		for(int i = 0; i < modules.length; i++) {
 			builder.append(modules[i]);
@@ -51,6 +51,26 @@ public class Identifier implements Parsable {
 		}
 		builder.append(name);
 		return builder.toString();
+	}
+	
+	/**
+	 * Gets the modules qualifying this identifier.
+	 * @return An array of the nested module names qualifying this identifier.
+	 * For example, given an identifier {@code mu:test:func}, this would return
+	 * an array {@code ["mu", "test"]}.
+	 */
+	public String[] getModules() {
+		return modules;
+	}
+	
+	/**
+	 * Gets the name of this identifier.
+	 * @return The name of this identifier.
+	 * For example, given an identifier {@code mu:test:func}, this would return
+	 * a string {@code "func"}.
+	 */
+	public String getName() {
+		return name;
 	}
 	
 	/**

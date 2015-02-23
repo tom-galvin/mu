@@ -2,9 +2,9 @@ package pw.usn.mu.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import pw.usn.mu.tokenizer.IdentifierToken;
-import pw.usn.mu.tokenizer.SymbolToken;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**
@@ -14,7 +14,7 @@ public class Identifier implements Parsable {
 	/**
 	 * The symbol used to qualify identifiers with module names.
 	 */
-	public static final char QUALIFIER_SYMBOL = '/';
+	public static final String QUALIFIER_SYMBOL = ":";
 	private String[] modules;
 	private String name;
 	
@@ -39,7 +39,7 @@ public class Identifier implements Parsable {
 	 * code, representing this identifier.
 	 */
 	public Identifier(String identifier) {
-		this(identifier.split("\\" + QUALIFIER_SYMBOL));
+		this(identifier.split(Pattern.quote(QUALIFIER_SYMBOL)));
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class Identifier implements Parsable {
 	public static Identifier parse(Parser parser) {
 		List<String> identifierParts = new ArrayList<String>();
 		do {
-			parser.expect(token -> token instanceof IdentifierToken, "Identifier expected");
+			parser.expect(token -> token instanceof IdentifierToken, "Identifier expected.");
 			identifierParts.add(((IdentifierToken)parser.current()).getIdentifier());
 		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.NAMESPACE_QUALIFIER)));
 		String[] partsArray = new String[identifierParts.size()];

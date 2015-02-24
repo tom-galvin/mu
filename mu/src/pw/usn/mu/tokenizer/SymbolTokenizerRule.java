@@ -12,7 +12,7 @@ public class SymbolTokenizerRule implements TokenizerRule {
 	
 	/**
 	 * Initializes a new SymbolTokenizerRule with the given matching pattern and the type of the symbol token to return.
-	 * @param pattern The {@link java.util.regex.Pattern Pattern} to match in order to read a token of type {@code T}.
+	 * @param pattern The {@link java.util.regex.Pattern Pattern} to match in order to read a token of the given type.
 	 * @param type The type {@link SymbolToken} to return.
 	 */
 	public SymbolTokenizerRule(Pattern pattern, SymbolTokenType type) {
@@ -30,6 +30,15 @@ public class SymbolTokenizerRule implements TokenizerRule {
 	 */
 	public SymbolTokenizerRule(String regex, SymbolTokenType type) {
 		this(Pattern.compile(regex), type);
+	}
+	
+	/**
+	 * Initializes a new SymbolTokenizerRule with the type of the symbol token to return, using the pattern provided by the
+	 * given {@link SymbolTokenType} itself.
+	 * @param type The type {@link SymbolToken} to return.
+	 */
+	public SymbolTokenizerRule(SymbolTokenType type) {
+		this(type.getPattern(), type);
 	}
 
 	@Override

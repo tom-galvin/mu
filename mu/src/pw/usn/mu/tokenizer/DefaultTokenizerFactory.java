@@ -27,11 +27,12 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 	 * @param tokenizer The tokenizer to add symbol tokenizing rules to.
 	 */
 	private void addSymbolRules(Tokenizer tokenizer) {
-		tokenizer.addRule(new SymbolTokenizerRule("\\(", SymbolTokenType.PAREN_OPEN));
-		tokenizer.addRule(new SymbolTokenizerRule("\\)", SymbolTokenType.PAREN_CLOSE));
-		tokenizer.addRule(new SymbolTokenizerRule(Identifier.QUALIFIER_SYMBOL, SymbolTokenType.NAMESPACE_QUALIFIER));
-		tokenizer.addRule(new SymbolTokenizerRule(",", SymbolTokenType.COMMA));
-		tokenizer.addRule(new SymbolTokenizerRule("\\\\", SymbolTokenType.FUNCTION_BEGIN));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.BINDING));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.PAREN_OPEN));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.PAREN_CLOSE));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.NAMESPACE_QUALIFIER));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.COMMA));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.FUNCTION_BEGIN));
 	}
 	
 	/**

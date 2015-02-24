@@ -1,5 +1,7 @@
 package pw.usn.mu.tokenizer;
 
+import java.util.regex.Pattern;
+
 import pw.usn.mu.parser.Identifier;
 
 /**
@@ -21,14 +23,18 @@ public enum SymbolTokenType {
 	 */
 	NAMESPACE_QUALIFIER(String.valueOf(Identifier.QUALIFIER_SYMBOL)),
 	/**
-	 * Represents the starting sigil for a function ({@code \}), to be
-	 * followed by an identifier name for a new variable.
+	 * Represents the starting sigil for a function ({@code \}),
+	 * to be followed by an identifier name for an argument.
 	 */
 	FUNCTION_BEGIN("\\"),
 	/**
 	 * Represents the comma symbol ({@code ,}).
 	 */
-	COMMA(",");
+	COMMA(","),
+	/**
+	 * Represents the arrow ({@code =>}) used to create a binding.
+	 */
+	BINDING("=>");
 	
 	private String display;
 	
@@ -38,6 +44,14 @@ public enum SymbolTokenType {
 	 */
 	private SymbolTokenType(String display) {
 		this.display = display;
+	}
+	
+	/**
+	 * Gets a pattern for this symbol token type during tokenization.
+	 * @return A pattern that matches this symbol token type in mu source code.
+	 */
+	public Pattern getPattern() { 
+		return Pattern.compile(Pattern.quote(display));
 	}
 	
 	/**

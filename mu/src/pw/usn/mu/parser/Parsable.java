@@ -7,7 +7,7 @@ package pw.usn.mu.parser;
 public interface Parsable {
 	/**
 	 * Gets the equivalent mu source code for this element.
-	 * @param indentationLevel the current indentation level at which to
+	 * @param indentationLevel The current indentation level at which to
 	 * output the code.
 	 * @return Source code which, when parsed, would be identical to
 	 * this object.

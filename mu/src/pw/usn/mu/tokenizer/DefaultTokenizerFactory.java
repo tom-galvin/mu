@@ -1,7 +1,5 @@
 package pw.usn.mu.tokenizer;
 
-import pw.usn.mu.parser.Identifier;
-
 /**
  * A factory for creating mu language tokenizers.
  */
@@ -9,6 +7,11 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 	@Override
 	public Tokenizer create() {
 		Tokenizer tokenizer = new Tokenizer();
+
+		tokenizer.addRule(new IgnoreTokenizerRule(
+				"(?s)/\\*.*?\\*/")); // multi line comment
+		tokenizer.addRule(new IgnoreTokenizerRule(
+				"(?m)//.*?$")); // single line comment
 		
 		tokenizer.addRule(new SimpleTokenizerRule(
 				"[A-Za-z_][A-Za-z0-9_]*",
@@ -16,6 +19,10 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 		
 		addLiteralRules(tokenizer);
 		addSymbolRules(tokenizer);
+		
+		tokenizer.addRule(new SimpleTokenizerRule(
+				"[\\Q&|^#<>=$+-:/*%!`\\E][\\Q&|^#<>=$+-:/*%!`()[]{}\\E@]*",
+				(loc, res) -> new OperatorToken(loc, res.group())));
 		
 		tokenizer.addRule(new IgnoreTokenizerRule("[ \t\\n]+"));
 		tokenizer.addRule(new IgnoreTokenizerRule("(?m)#.*?$"));
@@ -33,6 +40,8 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.NAMESPACE_QUALIFIER));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.COMMA));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.FUNCTION_BEGIN));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.MODULE_BEGIN));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.END_DECLARATION));
 	}
 	
 	/**
@@ -51,21 +60,21 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 		 */
 		
 		tokenizer.addRule(new SimpleTokenizerRule(
-				"\\-?0b[01]+",
+				"0b[01]+",
 				(loc, res) -> new LiteralIntToken(
 						loc,
 						LiteralIntTokenBase.BINARY.fromString(res.group()),
 						LiteralIntTokenBase.BINARY)));
 		
 		tokenizer.addRule(new SimpleTokenizerRule(
-				"\\-?0x[0-9A-Fa-f]+",
+				"0x[0-9A-Fa-f]+",
 				(loc, res) -> new LiteralIntToken(
 						loc,
 						LiteralIntTokenBase.HEXADECIMAL.fromString(res.group()),
 						LiteralIntTokenBase.HEXADECIMAL)));
 		
 		tokenizer.addRule(new SimpleTokenizerRule(
-				"\\-?[0-9]+",
+				"[0-9]+",
 				(loc, res) -> new LiteralIntToken(
 						loc,
 						LiteralIntTokenBase.DECIMAL.fromString(res.group()),

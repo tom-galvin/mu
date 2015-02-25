@@ -6,7 +6,7 @@ import pw.usn.mu.tokenizer.LiteralIntTokenBase;
 /**
  * Represents an int literal in mu source code.
  */
-public class LiteralInt implements Parsable {
+public class LiteralInt implements Parsable, Expression {
 	private int value;
 	private LiteralIntTokenBase originalBase;
 	
@@ -47,11 +47,6 @@ public class LiteralInt implements Parsable {
 	 */
 	public LiteralIntTokenBase getOriginalBase() {
 		return originalBase;
-	}
-
-	@Override
-	public String toSource(int indentationLevel) {
-		return originalBase.toString(value);
 	}
 	
 	/**

@@ -11,6 +11,7 @@ import pw.usn.mu.tokenizer.Token;
 public class Parser {
 	private Token[] tokens;
 	private int index;
+	private Parser parent;
 	
 	/**
 	 * Initialize a new Parser with the given array of tokens, and index in the token
@@ -23,6 +24,7 @@ public class Parser {
 	private Parser(Token[] tokens, int index) {
 		this.tokens = tokens;
 		this.index = index;
+		this.parent = null;
 	}
 	
 	/**
@@ -40,6 +42,20 @@ public class Parser {
 	public Token current() {
 		if(index >= 0 && index < tokens.length) {
 			return tokens[index];
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Gets the Token {@code lookahead} places ahead of the current token in the Token
+	 * array.
+	 * @return The token in the token array at the location of the parser head, plus
+	 * {@code lookahead}.
+	 */
+	public Token current(int lookahead) {
+		if(index + lookahead >= 0 && index + lookahead < tokens.length) {
+			return tokens[index + lookahead];
 		} else {
 			return null;
 		}
@@ -82,7 +98,7 @@ public class Parser {
 	 * condition}.
 	 */
 	public boolean test(Predicate<Token> condition, int lookahead) {
-		return !eof() && condition.test(tokens[index + 1]);
+		return !eof() && condition.test(tokens[index + 1 + lookahead]);
 	}
 	
 	/**
@@ -134,6 +150,37 @@ public class Parser {
 	 * @return A new {@link Parser} instance with the same state.
 	 */
 	public Parser copyState() {
-		return new Parser(tokens, index);
+		Parser child = new Parser(tokens, index);
+		child.parent = this;
+		return child;
+	}
+	
+	/**
+	 * Determines if this parser was created by calling {@link Parser#copyState()} on either
+	 * {@code ancestor}, or a (recursive) child of {@code ancestor}.
+	 * @param ancestor The ancestor to check if this Parser descends from.
+	 * @return Whether this parser is a descendant of {@code ancestor}.
+	 */
+	public boolean descendsFrom(Parser ancestor) {
+		if(this.parent == null) {
+			return false;
+		} else if(this.parent == ancestor) {
+			return true;
+		} else {
+			return this.parent.descendsFrom(ancestor);
+		}
+	}
+	
+	/**
+	 * Fast-forwards this parser to the state of the given child parser.
+	 * @param parser The child parser. The current parser will be fast-forwarded to whichever
+	 * token {@code parser} is at currently.
+	 */
+	public void fastForward(Parser parser) {
+		if(parser.descendsFrom(this)) {
+			this.index = parser.index;
+		} else {
+			throw new IllegalArgumentException("This parser must be an ancestor of the given child parser.");
+		}
 	}
 }

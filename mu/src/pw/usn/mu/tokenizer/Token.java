@@ -45,6 +45,19 @@ public abstract class Token {
 	}
 	
 	/**
+	 * Determines if this Token marks the beginning of an atomic non-terminal in the
+	 * parsing stage.
+	 * @return Whether this token is the beginning of an atomic node.
+	 */
+	public boolean isAtomicToken() {
+		return
+				this instanceof LiteralIntToken ||
+				this instanceof LiteralStringToken ||
+				this instanceof IdentifierToken ||
+				isSymbolToken(SymbolTokenType.PAREN_OPEN);
+	}
+	
+	/**
 	 * Determines if this Token is a {@link SymbolToken} of the specified type.
 	 * @param type The type of symbol token to check for.
 	 * @return Returns {@code true} if this token is an instance of {@link SymbolToken}, and
@@ -52,6 +65,16 @@ public abstract class Token {
 	 */
 	public boolean isSymbolToken(SymbolTokenType type) {
 		return this instanceof SymbolToken && ((SymbolToken)this).getType().equals(type);
+	}
+	
+	/**
+	 * Determines if this Token is a {@link OperatorToken} of the specified type.
+	 * @param type The type of operator token to check for.
+	 * @return Returns {@code true} if this token is an instance of {@link OperatorToken}, and
+	 * {@link OperatorToken#getType()} equals {@code type}.
+	 */
+	public boolean isOperatorToken(OperatorTokenType type) {
+		return this instanceof OperatorToken && ((OperatorToken)this).getType().equals(type);
 	}
 
 	@Override

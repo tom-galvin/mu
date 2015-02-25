@@ -10,11 +10,11 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents an (optionally qualified) identifier in mu source code.
  */
-public class Identifier implements Parsable {
+public class Identifier implements Parsable, Expression {
 	/**
 	 * The symbol used to qualify identifiers with module names.
 	 */
-	public static final String QUALIFIER_SYMBOL = ":";
+	public static final String QUALIFIER_SYMBOL = ".";
 	private String[] modules;
 	private String name;
 	
@@ -40,17 +40,6 @@ public class Identifier implements Parsable {
 	 */
 	public Identifier(String identifier) {
 		this(identifier.split(Pattern.quote(QUALIFIER_SYMBOL)));
-	}
-
-	@Override
-	public String toSource(int indentationLevel) {
-		StringBuilder builder = new StringBuilder();
-		for(int i = 0; i < modules.length; i++) {
-			builder.append(modules[i]);
-			builder.append(QUALIFIER_SYMBOL);
-		}
-		builder.append(name);
-		return builder.toString();
 	}
 	
 	/**
@@ -87,5 +76,36 @@ public class Identifier implements Parsable {
 		String[] partsArray = new String[identifierParts.size()];
 		identifierParts.toArray(partsArray);
 		return new Identifier(partsArray);
+	}
+	
+	@Override
+	public int hashCode() {
+		int hashCode = 0x633c0b24, prevHashCode = 0x6902a10c;
+		for(int i = 0; i < modules.length; i++) {
+			int currentHashCode = modules.hashCode();
+			hashCode ^= currentHashCode * i + (prevHashCode << ((i + currentHashCode) % 3));
+			prevHashCode = currentHashCode;
+		}
+		return hashCode;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj != null && obj instanceof Identifier) {
+			Identifier identifier = (Identifier)obj;
+			if(!identifier.name.equals(this.name)) {
+				return false;
+			}
+			if(identifier.modules.length != this.modules.length) {
+				return false;
+			}
+			for(int i = 0; i < this.modules.length; i++) {
+				if(!this.modules[i].equals(identifier.modules[i])) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 }

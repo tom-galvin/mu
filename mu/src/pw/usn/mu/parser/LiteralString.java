@@ -5,7 +5,7 @@ import pw.usn.mu.tokenizer.LiteralStringToken;
 /**
  * Represents a string literal in mu source code.
  */
-public class LiteralString implements Parsable {
+public class LiteralString implements Parsable, Expression {
 	/**
 	 * The delimiter used to signal the start and end of a literal string in source code.
 	 */
@@ -28,20 +28,12 @@ public class LiteralString implements Parsable {
 		return value;
 	}
 	
-	@Override
-	public String toSource(int indentationLevel) {
-		return String.format("%s%s%s",
-				LITERAL_STRING_DELIMITER,
-				value,
-				LITERAL_STRING_DELIMITER);
-	}
-	
 	/**
 	 * Parses a string literal from the given parser state.
 	 * @param parser The parser enumerator to use.
 	 * @return A string literal, as parsed from the current input.
 	 */
-	public LiteralString parse(Parser parser) {
+	public static LiteralString parse(Parser parser) {
 		parser.expect(token -> token instanceof LiteralStringToken, "String literal expected.");
 		return new LiteralString(((LiteralStringToken)parser.current()).getValue());
 	}

@@ -1,13 +1,17 @@
 package pw.usn.mu.parser;
 
+import java.util.Stack;
+
+import pw.usn.mu.tokenizer.IdentifierToken;
 import pw.usn.mu.tokenizer.SymbolTokenType;
+import pw.usn.mu.tokenizer.Token;
 
 /**
  * Represents a function which takes an argument and transforms it in some way.
  */
-public class Function implements Parsable {
+public class Function implements Parsable, Expression {
 	private Identifier argumentName;
-	public Parsable body;
+	private Expression body;
 	
 	/**
 	 * Initializes a new Function with the given argument identifier and function
@@ -15,7 +19,7 @@ public class Function implements Parsable {
 	 * @param argumentName The identifier of the function argument.
 	 * @param body The body of the function.
 	 */
-	public Function(Identifier argumentName, Parsable body) {
+	public Function(Identifier argumentName, Expression body) {
 		this.argumentName = argumentName;
 		this.body = body;
 	}
@@ -33,45 +37,35 @@ public class Function implements Parsable {
 	 * @return The body of the function, which transforms the argument into some
 	 * other value.
 	 */
-	public Parsable getBody() {
+	public Expression getBody() {
 		return body;
 	}
 	
-	@Override
-	public String toSource(int indentationLevel) {
-		if(body instanceof Function) {
-			return ((Function)body).toSource(
-					indentationLevel,
-					String.format("%s%s ",
-							argumentName.toSource(indentationLevel),
-							SymbolTokenType.COMMA.getDisplayString()));
-		} else {
-			return toSource(indentationLevel, "");
-		}
-	}
-	
 	/**
-	 * Gets the equivalent mu source code for this Function.
-	 * @param indentationLevel The current indentation level at which to
-	 * output the code.
-	 * @param previousArguments The string representation of any arguments of
-	 * parent functions, such to make the outputted code look nicer.
-	 * @return Source code which, when parsed, would be identical to
-	 * this function.
+	 * Parses a function from the given parser state.
+	 * @param parser The parser enumerator to use.
+	 * @return An {@link Function}, as parsed from the current input.
 	 */
-	public String toSource(int indentationLevel, String previousArguments) {
-		String openingString = String.format("%s%s",
-				SymbolTokenType.PAREN_OPEN.getDisplayString(),
-				SymbolTokenType.FUNCTION_BEGIN.getDisplayString());
-		String bodyString = body.toSource(indentationLevel + openingString.length());
-		boolean newlineNeeded = bodyString.contains("\n");
-		
-		return String.format("%s%s%s%s%s%s",
-				openingString,
-				previousArguments,
-				argumentName.toSource(indentationLevel),
-				newlineNeeded ? "\n" : " ",
-				bodyString,
-				SymbolTokenType.PAREN_CLOSE.getDisplayString());
+	public static Function parse(Parser parser) {
+		Stack<Identifier> arguments = new Stack<Identifier>();
+		parser.expect(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN), "Expected beginning of function.");
+		do {
+			Token argumentToken = parser.current(1);
+			if(!parser.test(token -> token instanceof IdentifierToken)) {
+				throw new ParserException("Expected function argument.", argumentToken);
+			}
+			Identifier argumentName = Identifier.parse(parser);
+			if(argumentName.getModules().length == 0) {
+				arguments.push(argumentName);
+			} else {
+				throw new ParserException("Function argument must not be qualified.", argumentToken);
+			}
+		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.COMMA)));
+		Expression content = Binding.parse(parser);
+		Function function = new Function(arguments.pop(), content);
+		while(!arguments.empty()) {
+			function = new Function(arguments.pop(), function);
+		}
+		return function;
 	}
 }

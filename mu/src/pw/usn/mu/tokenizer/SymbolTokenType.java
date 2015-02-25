@@ -28,18 +28,29 @@ public enum SymbolTokenType {
 	 */
 	FUNCTION_BEGIN("\\"),
 	/**
+	 * Represents the starting sigil for a module ({@code @}),
+	 * to be followed by a list of definitions.
+	 */
+	MODULE_BEGIN("@"),
+	/**
 	 * Represents the comma symbol ({@code ,}).
 	 */
 	COMMA(","),
 	/**
-	 * Represents the arrow ({@code =>}) used to create a binding.
+	 * Represents the back-arrow ({@code <-}) used to create a binding.
 	 */
-	BINDING("=>");
+	BINDING("<-"),
+	/**
+	 * Represents the semicolon ({@code ;}) used to end a declaration, such
+	 * as a binding or match sub-expression.
+	 */
+	END_DECLARATION(";");
 	
 	private String display;
 	
 	/**
-	 * Create a new SymbolTokenType with the specified display string.
+	 * Create a new SymbolTokenType with the specified display string and token
+	 * level.
 	 * @param display The display string of the given symbol token type.
 	 */
 	private SymbolTokenType(String display) {

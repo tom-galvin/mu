@@ -82,10 +82,12 @@ public class Identifier implements Parsable, Expression {
 	public int hashCode() {
 		int hashCode = 0x633c0b24, prevHashCode = 0x6902a10c;
 		for(int i = 0; i < modules.length; i++) {
-			int currentHashCode = modules.hashCode();
+			int currentHashCode = modules[i].hashCode();
 			hashCode ^= currentHashCode * i + (prevHashCode << ((i + currentHashCode) % 3));
 			prevHashCode = currentHashCode;
 		}
+		int currentHashCode = name.hashCode();
+		hashCode ^= currentHashCode + modules.length ^ (prevHashCode);
 		return hashCode;
 	}
 	

@@ -8,11 +8,9 @@ import pw.usn.mu.tokenizer.OperatorTokenType;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**
- * Defines methods for parsing miscellaneous aspects of Mu's grammar, such as
- * expressions which do not explicitly involve a specific type of syntax tree
- * node.
+ * Defines methods for parsing expression-related parts of mu's grammar.
  */
-public final class Grammar {
+public final class ExpressionGrammar {
 	/**
 	 * Creates an expression representing the application of a binary operator with a left
 	 * and right operand.
@@ -39,7 +37,7 @@ public final class Grammar {
 	
 	/**
 	 * Parses an atomic expression - that is, one such as a literal expression,
-	 * an identifier or a function.
+	 * an identifier, a bracketed expression or a function.
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input.
 	 */
@@ -50,6 +48,8 @@ public final class Grammar {
 			return LiteralInt.parse(parser);
 		} else if(parser.test(token -> token instanceof IdentifierToken)) {
 			return Identifier.parse(parser);
+		} else if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_OPEN))) {
+			return Sequence.parse(parser);
 		} else if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
 			Expression expression;
 			if(parser.test(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN))) {
@@ -61,7 +61,7 @@ public final class Grammar {
 			return expression;
 		} else {
 			parser.next();
-			throw new ParserException("Unexpected token.", parser.current());
+			throw new ParserException("Unexpected token in expression.", parser.current(1));
 		}
 	}
 	

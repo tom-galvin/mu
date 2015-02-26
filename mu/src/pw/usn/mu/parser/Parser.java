@@ -140,7 +140,7 @@ public class Parser {
 	 */
 	public void expect(Predicate<Token> condition, String errorMessage) {
 		if(!accept(condition)) {
-			throw new ParserException(errorMessage, current());
+			throw new ParserException(errorMessage, current(1));
 		}
 	}
 	

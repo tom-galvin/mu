@@ -117,7 +117,7 @@ public class Module implements Parsable {
 	/**
 	 * Parses the content of a module from the given parser state.
 	 * @param parser The parser enumerator to use.
-	 * @return An {@link Module}, as parsed from the current input.
+	 * @return A {@link Module}, as parsed from the current input.
 	 */
 	public static Module parse(Parser parser) {
 		Module module = new Module();

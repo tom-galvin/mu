@@ -17,6 +17,14 @@ public enum SymbolTokenType {
 	 */
 	PAREN_CLOSE(")"),
 	/**
+	 * Represents an opening square bracket ({@code [}), for sequence literals or types.
+	 */
+	SEQUENCE_OPEN("["),
+	/**
+	 * Represents a closing square bracket ({@code ]}), for sequence literals or types.
+	 */
+	SEQUENCE_CLOSE("]"),
+	/**
 	 * Represents a namespace qualifier (with the symbol {@link
 	 * Identifier#QUALIFIER_SYMBOL}), used for specifying the parent module
 	 * that contains an identifier.
@@ -40,6 +48,11 @@ public enum SymbolTokenType {
 	 * Represents the back-arrow ({@code <-}) used to create a binding.
 	 */
 	BINDING("<-"),
+	/**
+	 * Represents the forward-arrow ({@code ->}) used to declare the beginning of
+	 * a function body, or represent a function in a type expression.
+	 */
+	FUNCTION("->"),
 	/**
 	 * Represents the semicolon ({@code ;}) used to end a declaration, such
 	 * as a binding or match sub-expression.

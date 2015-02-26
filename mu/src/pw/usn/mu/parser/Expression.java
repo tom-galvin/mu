@@ -12,6 +12,6 @@ public interface Expression extends Parsable {
 	 * @return An expression, as parsed from the current input.
 	 */
 	public static Expression parse(Parser parser) {
-		return Grammar.parseBooleanPrecedence(parser);
+		return Tuple.parse(parser);
 	}
 }

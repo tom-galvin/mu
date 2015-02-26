@@ -43,9 +43,9 @@ public class Application implements Parsable, Expression {
 	 * application of anything.
 	 */
 	public static Expression parse(Parser parser) { 
-		Expression left = Grammar.parseAtomic(parser);
+		Expression left = ExpressionGrammar.parseAtomic(parser);
 		while(parser.test(token -> token.isAtomicToken())) {
-			left = new Application(left, Grammar.parseAtomic(parser));
+			left = new Application(left, ExpressionGrammar.parseAtomic(parser));
 		}
 		return left;
 	}

@@ -76,6 +76,16 @@ public abstract class Token {
 	public boolean isOperatorToken(OperatorTokenType type) {
 		return this instanceof OperatorToken && ((OperatorToken)this).getType().equals(type);
 	}
+	
+	/**
+	 * Determines if this Token is a {@link OperatorToken} with the specified symbol.
+	 * @param operator The operator to check for.
+	 * @return Returns {@code true} if this token is an instance of {@link OperatorToken}, and
+	 * {@link OperatorToken#getOperator()} equals {@code operator}.
+	 */
+	public boolean isOperatorToken(String operator) {
+		return this instanceof OperatorToken && ((OperatorToken)this).getOperator().equals(operator);
+	}
 
 	@Override
 	public int hashCode() {

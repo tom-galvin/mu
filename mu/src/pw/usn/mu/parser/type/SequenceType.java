@@ -1,12 +1,6 @@
 package pw.usn.mu.parser.type;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import pw.usn.mu.parser.Expression;
-import pw.usn.mu.parser.ExpressionGrammar;
 import pw.usn.mu.parser.Parser;
-import pw.usn.mu.parser.Sequence;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**

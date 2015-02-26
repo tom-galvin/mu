@@ -13,6 +13,6 @@ public interface Type extends Parsable {
 	 * @return A {@link Type}, as parsed from the current input.
 	 */
 	public static Type parse(Parser parser) {
-		return DefinedType.parse(parser);
+		return SumType.parse(parser);
 	}
 }

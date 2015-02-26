@@ -9,9 +9,9 @@ import pw.usn.mu.parser.ParserException;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**
- * Represents a reference (with an identifier) to an already defined type.
+ * Represents a generic, unspecified type.
  */
-public class DefinedType implements Type {
+public class GenericType implements Type {
 	private Identifier identifier;
 	private Type[] parameters;
 	
@@ -23,7 +23,7 @@ public class DefinedType implements Type {
 	 * @param parameters Type parameters to specialize this this type reference, if
 	 * it refers to a generic type.
 	 */
-	public DefinedType(Identifier identifier, Type[] parameters) {
+	public GenericType(Identifier identifier, Type[] parameters) {
 		this.identifier = identifier;
 		this.parameters = parameters != null ? parameters : new Type[0];
 	}
@@ -34,7 +34,7 @@ public class DefinedType implements Type {
 	 * @param identifier The identifier of the defined type which this DefinedType
 	 * refers to.
 	 */
-	public DefinedType(Identifier identifier) {
+	public GenericType(Identifier identifier) {
 		this(identifier, null);
 	}
 	
@@ -67,9 +67,9 @@ public class DefinedType implements Type {
 	/**
 	 * Parses a defined type reference from the given parser state.
 	 * @param parser The parser enumerator to use.
-	 * @return A {@link DefinedType}, as parsed from the current input.
+	 * @return A {@link GenericType}, as parsed from the current input.
 	 */
-	public static DefinedType parse(Parser parser) {
+	public static GenericType parse(Parser parser) {
 		Identifier identifier = Identifier.parse(parser);
 		if(parser.accept(token -> token.isOperatorToken("<"))) {
 			if(parser.test(token -> token.isOperatorToken(">"))) {
@@ -82,9 +82,9 @@ public class DefinedType implements Type {
 			parser.expect(token -> token.isOperatorToken(">"), "End of type parameter list expected.");
 			Type[] typesArray = new Type[types.size()];
 			types.toArray(typesArray);
-			return new DefinedType(identifier, typesArray);
+			return new GenericType(identifier, typesArray);
 		} else {
-			return new DefinedType(identifier);
+			return new GenericType(identifier);
 		}
 	}
 }

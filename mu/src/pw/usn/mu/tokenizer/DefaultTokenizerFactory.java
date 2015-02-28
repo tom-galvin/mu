@@ -21,7 +21,7 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 		addSymbolRules(tokenizer);
 		
 		tokenizer.addRule(new SimpleTokenizerRule(
-				"[\\Q&|^#<>=$+-:/*%!`\\E][\\Q&|^#<>=$+-:/*%?.!`()[]{}\\E@]*",
+				"([\\Q&|^#<>=$+-:/*%!~\\E][\\Q&|^#<>=$+-:/*%?!~()[]{}\\E@]*)|(`[A-Za-z]+`)",
 				(loc, res) -> new OperatorToken(loc, res.group())));
 		
 		tokenizer.addRule(new IgnoreTokenizerRule("[ \t\\n]+"));
@@ -34,16 +34,17 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 	 * @param tokenizer The tokenizer to add symbol tokenizing rules to.
 	 */
 	private void addSymbolRules(Tokenizer tokenizer) {
-		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.BINDING));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.BIND));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.PAREN_OPEN));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.PAREN_CLOSE));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.NAMESPACE_QUALIFIER));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.COMMA));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.FUNCTION_DECLARE));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.MODULE_DECLARE));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.FUNCTION_BEGIN));
-		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.MODULE_BEGIN));
-		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.FUNCTION));
-		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.SPECIFICATION));
-		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.END_DECLARATION));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.CONS));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.SWITCH_DECLARE));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.SEPARATOR));
 	}
 	
 	/**

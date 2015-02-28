@@ -12,7 +12,7 @@ public class Tuple implements Expression {
 	private Expression[] values;
 	
 	/**
-	 * Initializes a new Tuple with the given {@code values}.
+	 * Initializes a new untagged Tuple with the given {@code values}.
 	 * @param values The values contained within this tuple.
 	 */
 	public Tuple(Expression... values) {

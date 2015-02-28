@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import pw.usn.mu.tokenizer.IdentifierToken;
+import pw.usn.mu.tokenizer.OperatorToken;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 import pw.usn.mu.tokenizer.Token;
 
@@ -121,15 +122,33 @@ public class Module implements Parsable {
 	 */
 	public static Module parse(Parser parser) {
 		Module module = new Module();
-		while(parser.test(token -> token instanceof IdentifierToken)) {
-			Token identifierToken = parser.current(1);
-			Identifier identifier = Identifier.parse(parser);
-			if(identifier.getModules().length > 0) {
-				throw new ParserException("Module definition cannot be qualified.", identifierToken);
+		while(parser.test(token -> token instanceof IdentifierToken) ||
+		      parser.test(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
+			Token identifierToken;
+			Identifier identifier;
+			boolean isSymbolIdentifer;
+			
+			if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
+				parser.expect(token -> token instanceof OperatorToken, "Expected operator symbol in operator definition.");
+				identifierToken = parser.current();
+				identifier = new Identifier(((OperatorToken)identifierToken).getOperator());
+				parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Expected closing bracket after operator symbol.");
+				isSymbolIdentifer = true;
+			} else {
+				identifierToken = parser.current(1);
+				identifier = Identifier.parse(parser);
+				if(identifier.getModules().length > 0) {
+					throw new ParserException("Module definition cannot be qualified.", identifierToken);
+				}
+				isSymbolIdentifer = false;
 			}
-			parser.expect(token -> token.isSymbolToken(SymbolTokenType.BINDING), "Expected back-arrow in module definition.");
+			
+			parser.expect(token -> token.isSymbolToken(SymbolTokenType.BIND), "Expected back-arrow in module definition.");
 			if(parser.test(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN)) &&
-			   parser.test(token -> token.isSymbolToken(SymbolTokenType.MODULE_BEGIN), 1)) {
+			   parser.test(token -> token.isSymbolToken(SymbolTokenType.MODULE_DECLARE), 1)) {
+				if(isSymbolIdentifer) {
+					throw new ParserException("Module definition cannot be bound to an operator symbol.", identifierToken);
+				}
 				parser.next();
 				parser.next();
 				Module submodule = Module.parse(parser);
@@ -139,7 +158,10 @@ public class Module implements Parsable {
 				Expression expression = Expression.parse(parser);
 				module.addDefinition(identifier, expression);
 			}
-			parser.expect(token -> token.isSymbolToken(SymbolTokenType.END_DECLARATION), "Expected semi-colon after module definition.");
+			parser.expect(
+					token -> token.isSymbolToken(SymbolTokenType.SEPARATOR),
+					String.format("Expected semi-colon after definition of %s.",
+							identifier.toString()));
 		}
 		return module;
 	}

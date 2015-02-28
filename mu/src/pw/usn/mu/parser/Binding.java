@@ -77,11 +77,11 @@ public class Binding implements Parsable, Expression {
 			Token identifierToken = lookaheadParser.current(1); // get the identifier token for error reporting
 			Identifier identifier = Identifier.parse(lookaheadParser);
 			/* OK, we've parsed the identifier. Now let's see if there's a <- after it */
-			if(lookaheadParser.accept(token -> token.isSymbolToken(SymbolTokenType.BINDING))) {
+			if(lookaheadParser.accept(token -> token.isSymbolToken(SymbolTokenType.BIND))) {
 				/* there is, so parse the binding */
 				if(identifier.getModules().length == 0) {
 					Expression value = Expression.parse(lookaheadParser);
-					lookaheadParser.expect(token -> token.isSymbolToken(SymbolTokenType.END_DECLARATION), "Expected semicolon to end binding.");
+					lookaheadParser.expect(token -> token.isSymbolToken(SymbolTokenType.SEPARATOR), "Expected semicolon to end binding.");
 					Expression content = parse(lookaheadParser);
 					parser.fastForward(lookaheadParser); // bring the current parser up to the level of the look-ahead parser
 					return new Binding(identifier, value, content);

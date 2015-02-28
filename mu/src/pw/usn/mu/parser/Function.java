@@ -2,7 +2,6 @@ package pw.usn.mu.parser;
 
 import java.util.Stack;
 
-import pw.usn.mu.parser.type.Type;
 import pw.usn.mu.tokenizer.IdentifierToken;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 import pw.usn.mu.tokenizer.Token;
@@ -13,22 +12,6 @@ import pw.usn.mu.tokenizer.Token;
 public class Function implements Parsable, Expression {
 	private Identifier argumentName;
 	private Expression body;
-	private Type argType, valType;
-	
-	/**
-	 * Initializes a new Function with the given argument identifier and function
-	 * body, and type specifiers for the function argument and return value.
-	 * @param argumentName The identifier of the function argument.
-	 * @param body The body of the function.
-	 * @param argType The type of the function argument, or {@code null} for unspecified.
-	 * @param valType The type of the function return value, or {@code null} for unspecified.
-	 */
-	public Function(Identifier argumentName, Expression body, Type argType, Type valType) {
-		this.argumentName = argumentName;
-		this.body = body;
-		this.argType = argType;
-		this.valType = valType;
-	}
 	
 	/**
 	 * Initializes a new Function with the given argument identifier and function
@@ -37,7 +20,8 @@ public class Function implements Parsable, Expression {
 	 * @param body The body of the function.
 	 */
 	public Function(Identifier argumentName, Expression body) {
-		this(argumentName, body, null, null);
+		this.argumentName = argumentName;
+		this.body = body;
 	}
 	
 	/**
@@ -58,61 +42,40 @@ public class Function implements Parsable, Expression {
 	}
 	
 	/**
-	 * Gets the type of the function argument.
-	 * @return The type of the function argument, or {@code null} if the function argument
-	 * has no specified type.
-	 */
-	public Type getArgumentType() {
-		return argType;
-	}
-	
-	/**
-	 * Gets the type of the function return value.
-	 * @return The type of the function return value, or {@code null} if the function has
-	 * no specified return type.
-	 */
-	public Type getReturnValurType() {
-		return valType;
-	}
-	
-	/**
 	 * Parses a function from the given parser state.
 	 * @param parser The parser enumerator to use.
 	 * @return An {@link Function}, as parsed from the current input.
 	 */
 	public static Function parse(Parser parser) {
 		Stack<Identifier> arguments = new Stack<Identifier>();
-		Stack<Type> types = new Stack<Type>();
-		Type returnType = null;
-		parser.expect(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN), "Expected beginning of function.");
-		if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
-			returnType = Type.parse(parser);
-			parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Expected closing parenthesis in type specification.");
+		parser.expect(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE), "Expected beginning of function.");
+		if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE))) {
+			Token switchExpressionToken = parser.current(2);
+			Switch switchBody = Switch.parse(parser);
+			Expression switchBodyExpression = switchBody.getExpression();
+			if(switchBodyExpression instanceof Identifier) {
+				Identifier argumentName = (Identifier)switchBodyExpression;
+				if(argumentName.getModules().length == 0) {
+					return new Function(argumentName, switchBody);
+				} else {
+					throw new ParserException("Switch function argument must not be qualified.", switchExpressionToken);
+				}
+			} else {
+				throw new ParserException("Switch function argument must be a non-qualified identifier.", switchExpressionToken);
+			}
 		}
 		do {
 			Token argumentToken = parser.current(1);
-			if(!parser.test(token -> token instanceof IdentifierToken)) {
-				throw new ParserException("Expected function argument.", argumentToken);
-			}
 			Identifier argumentName = Identifier.parse(parser);
 			if(argumentName.getModules().length == 0) {
 				arguments.push(argumentName);
 			} else {
 				throw new ParserException("Function argument must not be qualified.", argumentToken);
 			}
-			if(!parser.test(token -> token.isSymbolToken(SymbolTokenType.COMMA))) {
-				types.push(Type.parse(parser));
-			} else {
-				types.push(null);
-			}
-		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.COMMA)));
-		parser.expect(token -> token.isSymbolToken(SymbolTokenType.FUNCTION), "Expected forward arrow at end of argument list.");
+		} while(parser.test(token -> token instanceof IdentifierToken));
+		parser.expect(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN), "Expected forward arrow at end of argument list.");
 		Expression content = Binding.parse(parser);
 		Function function = new Function(arguments.pop(), content);
-		while(!arguments.empty()) {
-			function = new Function(arguments.pop(), function, types.pop(), returnType);
-			returnType = null;
-		}
 		return function;
 	}
 }

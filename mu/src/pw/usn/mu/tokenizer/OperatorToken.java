@@ -17,13 +17,18 @@ public class OperatorToken extends Token {
 	}
 
 	/**
-	 * Gets the operator string for this OperatorToken.
-	 * @return A string containing the operator symbol for this OperatorToken. For
-	 * example, calling this method on an addition OperatorToken would return the
-	 * string {@code "+"}.
+	 * Gets the operator string for this OperatorToken. For example, calling this
+	 * method on an addition OperatorToken would return the string {@code "+"},
+	 * and calling this method on an OperatorToken for the infix operator {@code `myOp`}
+	 * will return the strign {@code "myOp"} (the backticks are stripped).
+	 * @return A string containing the operator symbol for this OperatorToken.
 	 */
 	public String getOperator() {
-		return operator;
+		if(operator.startsWith("`") && operator.endsWith("`")) {
+			return operator.substring(1, operator.length() - 2);
+		} else {
+			return operator;
+		}
 	}
 
 	/**
@@ -35,8 +40,11 @@ public class OperatorToken extends Token {
 	 * <li>{@code <>=$} {@link OperatorTokenType#EQUALITY}</li>
 	 * <li>{@code +-:} {@link OperatorTokenType#SUM}</li>
 	 * <li>{@code /*%} {@link OperatorTokenType#PRODUCT}</li>
-	 * <li>{@code !`} {@link OperatorTokenType#UNARY}</li>
+	 * <li>{@code !~} {@link OperatorTokenType#UNARY}</li>
 	 * </ul>
+	 * Any other operators, such as text operators enclosed in backticks like an
+	 * operator named {@code `myAdd`}, is bound as tight as possible with the {@link
+	 * OperatorTokenType#PRODUCT} precedence.
 	 * @return The {@link OperatorTokenType} for this OperatorToken.
 	 */
 	public OperatorTokenType getType() {
@@ -61,10 +69,13 @@ public class OperatorToken extends Token {
 		case '%':
 			return OperatorTokenType.PRODUCT;
 		case '!':
-		case '`':
+		case '~':
 			return OperatorTokenType.UNARY;
-		default: // bind as loose as possible by default
-			return OperatorTokenType.BOOLEAN;
+		default:
+			/* Bind as tight as possible by default. This includes
+			 * operators in backticks.
+			 */
+			return OperatorTokenType.PRODUCT;
 		}
 	}
 	

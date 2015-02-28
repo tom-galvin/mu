@@ -54,7 +54,7 @@ public class Sequence implements Expression {
 			List<Expression> expressions = new ArrayList<Expression>();
 			do {
 				expressions.add(ExpressionGrammar.parseBooleanPrecedence(parser));
-			} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.END_DECLARATION)));
+			} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.SEPARATOR)));
 			parser.expect(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_CLOSE), "Expected end of sequence.");
 			Expression[] expressionsArray = new Expression[expressions.size()];
 			expressions.toArray(expressionsArray);

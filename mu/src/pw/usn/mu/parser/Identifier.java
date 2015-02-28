@@ -79,6 +79,17 @@ public class Identifier implements Parsable, Expression {
 	}
 	
 	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for(String module : modules) {
+			builder.append(module);
+			builder.append(QUALIFIER_SYMBOL);
+		}
+		builder.append(name);
+		return builder.toString();
+	}
+	
+	@Override
 	public int hashCode() {
 		int hashCode = 0x633c0b24, prevHashCode = 0x6902a10c;
 		for(int i = 0; i < modules.length; i++) {

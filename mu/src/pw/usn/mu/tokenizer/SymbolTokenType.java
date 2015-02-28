@@ -34,12 +34,12 @@ public enum SymbolTokenType {
 	 * Represents the starting sigil for a function ({@code \}),
 	 * to be followed by an identifier name for an argument.
 	 */
-	FUNCTION_BEGIN("\\"),
+	FUNCTION_DECLARE("\\"),
 	/**
 	 * Represents the starting sigil for a module ({@code @}),
 	 * to be followed by a list of definitions.
 	 */
-	MODULE_BEGIN("@"),
+	MODULE_DECLARE("@"),
 	/**
 	 * Represents the comma symbol ({@code ,}).
 	 */
@@ -47,21 +47,25 @@ public enum SymbolTokenType {
 	/**
 	 * Represents the back-arrow ({@code <-}) used to create a binding.
 	 */
-	BINDING("<-"),
+	BIND("<-"),
 	/**
 	 * Represents the forward-arrow ({@code ->}) used to declare the beginning of
 	 * a function body, or represent a function in a type expression.
 	 */
-	FUNCTION("->"),
+	FUNCTION_BEGIN("->"),
 	/**
-	 * Represents a type specificaton sigil ({@code :}) on a generic type.
+	 * Represents the cons operator ({@code :}).
 	 */
-	SPECIFICATION(":"),
+	CONS(":"),
 	/**
-	 * Represents the semicolon ({@code ;}) used to end a declaration, such
-	 * as a binding or match sub-expression.
+	 * Represents the start of a switch block ({@code ?}).
 	 */
-	END_DECLARATION(";");
+	SWITCH_DECLARE("?"),
+	/**
+	 * Represents the semicolon ({@code ;}) used to separate certain expressions such
+	 * as bindings and switch branches.
+	 */
+	SEPARATOR(";");
 	
 	private String display;
 	

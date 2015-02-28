@@ -52,15 +52,16 @@ public final class ExpressionGrammar {
 			return Sequence.parse(parser);
 		} else if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
 			Expression expression;
-			if(parser.test(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN))) {
+			if(parser.test(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE))) {
 				expression = Function.parse(parser);
+			} else if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE))) {
+				expression = Switch.parse(parser);
 			} else {
 				expression = Expression.parse(parser);
 			}
 			parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Closing parenthesis expected.");
 			return expression;
 		} else {
-			parser.next();
 			throw new ParserException("Unexpected token in expression.", parser.current(1));
 		}
 	}

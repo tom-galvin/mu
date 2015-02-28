@@ -36,18 +36,6 @@ public class Parser {
 	}
 	
 	/**
-	 * Gets the current Token.
-	 * @return The token in the token array at the location of the parser head.
-	 */
-	public Token current() {
-		if(index >= 0 && index < tokens.length) {
-			return tokens[index];
-		} else {
-			return null;
-		}
-	}
-	
-	/**
 	 * Gets the Token {@code lookahead} places ahead of the current token in the Token
 	 * array.
 	 * @return The token in the token array at the location of the parser head, plus
@@ -59,6 +47,14 @@ public class Parser {
 		} else {
 			return null;
 		}
+	}
+	
+	/**
+	 * Gets the current Token.
+	 * @return The token in the token array at the location of the parser head.
+	 */
+	public Token current() {
+		return current(0);
 	}
 	
 	/**

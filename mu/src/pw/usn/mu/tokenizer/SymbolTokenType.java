@@ -54,6 +54,10 @@ public enum SymbolTokenType {
 	 */
 	FUNCTION("->"),
 	/**
+	 * Represents a type specificaton sigil ({@code :}) on a generic type.
+	 */
+	SPECIFICATION(":"),
+	/**
 	 * Represents the semicolon ({@code ;}) used to end a declaration, such
 	 * as a binding or match sub-expression.
 	 */

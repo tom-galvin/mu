@@ -87,4 +87,35 @@ public class DefinedType implements Type {
 			return new DefinedType(identifier);
 		}
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj != null && obj instanceof DefinedType) {
+			DefinedType that = (DefinedType)obj;
+			if(!this.identifier.equals(that.identifier)) {
+				return false;
+			}
+			if(this.parameters.length != that.parameters.length) {
+				return false;
+			}
+			for(int i = 0; i < this.parameters.length; i++) {
+				if(this.parameters[i].equals(that.parameters[i])) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		int code = 0x89a00326;
+		code ^= identifier.hashCode();
+		for(int i = 0; i < parameters.length; i++) {
+			code ^= this.parameters[i].hashCode() << (i % 3);
+		}
+		return code;
+	}
 }

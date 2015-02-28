@@ -42,6 +42,7 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.FUNCTION_BEGIN));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.MODULE_BEGIN));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.FUNCTION));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.SPECIFICATION));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.END_DECLARATION));
 	}
 	

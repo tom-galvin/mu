@@ -7,22 +7,19 @@ import pw.usn.mu.tokenizer.Token;
 /**
  * Represents a binding, wherein a value is bound to a name.
  */
-public class Binding implements Parsable, Expression {
-	private Identifier name;
+public class Binding extends Expression {
+	private String name;
 	private Expression value;
 	private Expression content;
 	
 	/**
 	 * Initializes a new Binding with the given name and value, and content which
 	 * can refer to the bound value by the given name.
-	 * @param name The name of the newly-bound value, represented as an identifier.
+	 * @param name The name of the newly-bound value.
 	 * @param value The value to bind.
 	 * @param content The content of the binding.
 	 */
-	public Binding(Identifier name, Expression value, Expression content) {
-		if(name.getModules().length > 0) {
-			throw new IllegalArgumentException("Binding name cannot be qualified.");
-		}
+	public Binding(String name, Expression value, Expression content) {
 		this.name = name;
 		this.value = value;
 		this.content = content;
@@ -31,10 +28,10 @@ public class Binding implements Parsable, Expression {
 	/**
 	 * Gets the name of the binding.
 	 * @return The name to which the value is bound in this binding. For example, if
-	 * the value {@code "hello"} is bound to the name {@code myString}, then this
-	 * function returns {@code myString}.
+	 * the value {@code "hello"} is bound to the name {@code myIdentifier}, then this
+	 * function returns {@code "myIdentifier"}.
 	 */
-	public Identifier getName() {
+	public String getName() {
 		return name;
 	}
 	
@@ -76,21 +73,21 @@ public class Binding implements Parsable, Expression {
 			Parser lookaheadParser = parser.copyState(); // copy the parser state
 			Token identifierToken = lookaheadParser.current(1); // get the identifier token for error reporting
 			Identifier identifier = Identifier.parse(lookaheadParser);
-			/* OK, we've parsed the identifier. Now let's see if there's a <- after it */
-			if(lookaheadParser.accept(token -> token.isSymbolToken(SymbolTokenType.BIND))) {
+			if(identifier.isUnqualified()) {
+				/* OK, we've parsed the identifier. Now let's see if there's a <- after it */
+				if(lookaheadParser.accept(token -> token.isSymbolToken(SymbolTokenType.BIND))) {
 				/* there is, so parse the binding */
-				if(identifier.getModules().length == 0) {
 					Expression value = Expression.parse(lookaheadParser);
 					lookaheadParser.expect(token -> token.isSymbolToken(SymbolTokenType.SEPARATOR), "Expected semicolon to end binding.");
 					Expression content = parse(lookaheadParser);
 					parser.fastForward(lookaheadParser); // bring the current parser up to the level of the look-ahead parser
-					return new Binding(identifier, value, content);
-				} else {
-					/* binding target can't be qualified with module names so throw a ParserException */
-					throw new ParserException("Binding target must not be qualified.", identifierToken);
+					return new Binding(identifier.getName(), value, content);
 				}
+			} else {
+				/* binding target can't be qualified with module names so throw a ParserException */
+				throw new ParserException("Binding target must not be qualified.", identifierToken);
 			}
-			/* this wasn't actually a binding, so discard the lookaheadParser and carry on as before */
+			/* this wasn't actually a binding, so discard the LookaheadParser and carry on as before */
 		}
 		return Expression.parse(parser);
 	}

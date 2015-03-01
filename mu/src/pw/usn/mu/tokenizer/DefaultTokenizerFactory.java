@@ -21,7 +21,7 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 		addSymbolRules(tokenizer);
 		
 		tokenizer.addRule(new SimpleTokenizerRule(
-				"([\\Q&|^#<>=$+-:/*%!~\\E][\\Q&|^#<>=$+-:/*%?!~()[]{}\\E@]*)|(`[A-Za-z]+`)",
+				"([\\Q&|^#<>=$+-/*%!~\\E][\\Q&|^#<>=$+-/*%?!~\\E]*)|(`[A-Za-z]+`)",
 				(loc, res) -> new OperatorToken(loc, res.group())));
 		
 		tokenizer.addRule(new IgnoreTokenizerRule("[ \t\\n]+"));

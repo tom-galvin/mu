@@ -8,7 +8,7 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents a sequence literal in mu source code.
  */
-public class Sequence implements Expression {
+public class Sequence extends Expression {
 	private Expression[] values;
 	
 	/**
@@ -53,8 +53,8 @@ public class Sequence implements Expression {
 		} else {
 			List<Expression> expressions = new ArrayList<Expression>();
 			do {
-				expressions.add(ExpressionGrammar.parseBooleanPrecedence(parser));
-			} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.SEPARATOR)));
+				expressions.add(Expression.parseBound(parser));
+			} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.COMMA)));
 			parser.expect(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_CLOSE), "Expected end of sequence.");
 			Expression[] expressionsArray = new Expression[expressions.size()];
 			expressions.toArray(expressionsArray);

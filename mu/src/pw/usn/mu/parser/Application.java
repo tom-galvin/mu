@@ -3,7 +3,7 @@ package pw.usn.mu.parser;
 /**
  * Represents the application of a function with a given argument.
  */
-public class Application implements Parsable, Expression {
+public class Application extends Expression {
 	private Expression function;
 	private Expression argument;
 	
@@ -43,9 +43,9 @@ public class Application implements Parsable, Expression {
 	 * application of anything.
 	 */
 	public static Expression parse(Parser parser) { 
-		Expression left = ExpressionGrammar.parseAtomic(parser);
+		Expression left = Expression.parseAtomic(parser);
 		while(parser.test(token -> token.isAtomicToken())) {
-			left = new Application(left, ExpressionGrammar.parseAtomic(parser));
+			left = new Application(left, Expression.parseAtomic(parser));
 		}
 		return left;
 	}

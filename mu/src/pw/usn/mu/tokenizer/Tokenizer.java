@@ -31,6 +31,7 @@ public class Tokenizer {
 	 * @param source The source code to tokenize.
 	 * @return An array of {@link Token}s, representing all non-ignored tokens in {@code source} after
 	 * tokenizing.
+	 * @throws TokenizerException when the expression cannot be tokenized.
 	 */
 	public Token[] tokenize(Source source) {
 		List<Token> tokens = new ArrayList<Token>();

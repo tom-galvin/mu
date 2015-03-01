@@ -10,7 +10,7 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents an (optionally qualified) identifier in mu source code.
  */
-public class Identifier implements Parsable, Expression {
+public class Identifier extends Expression {
 	/**
 	 * The symbol used to qualify identifiers with module names.
 	 */
@@ -18,12 +18,17 @@ public class Identifier implements Parsable, Expression {
 	private String[] modules;
 	private String name;
 	
+	private Identifier() {
+		
+	}
+	
 	/**
 	 * Initializes a new Identifier with the specified identifier components.
 	 * @param names The components (normally separated by {@link
 	 * Identifier#QUALIFIER_SYMBOL}) comprising this identifier.
 	 */
 	public Identifier(String... names) {
+		this();
 		if(names.length == 0) {
 			throw new IllegalArgumentException("Must specify at least one component of identifier.");
 		} else {
@@ -31,6 +36,57 @@ public class Identifier implements Parsable, Expression {
 			System.arraycopy(names, 0, modules, 0, modules.length);
 			name = names[modules.length];
 		}
+	}
+	
+	/**
+	 * Creates a copy of this identifier with the first qualifying namespace
+	 * name removed.
+	 * @return A copy of this identifier with the head stripped.
+	 */
+	public Identifier tail() {
+		if(isUnqualified()) {
+			Identifier tailIdentifier = new Identifier();
+			tailIdentifier.name = name;
+			tailIdentifier.modules = new String[modules.length - 1];
+			System.arraycopy(modules, 1, tailIdentifier.modules, 0, tailIdentifier.modules.length);
+			return tailIdentifier;
+		} else {
+			throw new IllegalStateException("Cannot get the tail of an unqualified identifier.");
+		}
+	}
+	
+	/**
+	 * Gets the first component of this identifier.
+	 * @return If this identifier is unqualified, the name of the identifier is returned.
+	 * Otherwise, the first module is returned.
+	 */
+	public String head() {
+		if(isUnqualified()) {
+			return name;
+		} else {
+			return modules[0];
+		}
+	}
+	
+	/**
+	 * Creates a new identifier where {@code qualifyingIdentifier} is prepended to the
+	 * components of this identifier. For example, qualifying an identifier {@code some.stuff}
+	 * with the identifier {@code parent.module} would return an identifier
+	 * {@code parent.module.some.stuff}.
+	 * @param qualifyingIdentifier The identifier to qualify with.
+	 * @return THe resulting qualified identifier.
+	 */
+	public Identifier qualify(Identifier qualifyingIdentifier) {
+		Identifier newIdentifier = new Identifier();
+		newIdentifier.modules = new String[qualifyingIdentifier.modules.length + 1 + modules.length];
+		
+		System.arraycopy(qualifyingIdentifier.modules, 0, newIdentifier.modules, 0, qualifyingIdentifier.modules.length);
+		newIdentifier.modules[qualifyingIdentifier.modules.length] = qualifyingIdentifier.name;
+		System.arraycopy(modules, 0, newIdentifier.modules, qualifyingIdentifier.modules.length + 1, modules.length);
+		
+		newIdentifier.name = name;
+		
+		return newIdentifier;
 	}
 	
 	/**
@@ -50,6 +106,15 @@ public class Identifier implements Parsable, Expression {
 	 */
 	public String[] getModules() {
 		return modules;
+	}
+	
+	/**
+	 * Determines whether this identifier is unqualified (ie. no namespace
+	 * qualifiers).
+	 * @return Whether this identifier is unqualified.
+	 */
+	public boolean isUnqualified() {
+		return modules.length == 0;
 	}
 	
 	/**

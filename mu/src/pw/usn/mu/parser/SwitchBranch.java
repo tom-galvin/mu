@@ -5,7 +5,7 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents a branch of a switch statement.
  */
-public class SwitchBranch implements Expression {
+public class SwitchBranch extends Expression {
 	private Expression pattern, condition, result;
 	
 	/**

@@ -9,26 +9,26 @@ import pw.usn.mu.tokenizer.Token;
 /**
  * Represents a function which takes an argument and transforms it in some way.
  */
-public class Function implements Parsable, Expression {
-	private Identifier argumentName;
+public class Function extends Expression {
+	private String argumentName;
 	private Expression body;
 	
 	/**
 	 * Initializes a new Function with the given argument identifier and function
 	 * body.
-	 * @param argumentName The identifier of the function argument.
+	 * @param argumentName The name of the function argument.
 	 * @param body The body of the function.
 	 */
-	public Function(Identifier argumentName, Expression body) {
+	public Function(String argumentName, Expression body) {
 		this.argumentName = argumentName;
 		this.body = body;
 	}
 	
 	/**
 	 * Gets the argument name of the function.
-	 * @return The identifier representing the argument name.
+	 * @return The argument name.
 	 */
-	public Identifier getArgumentName() {
+	public String getArgumentName() {
 		return argumentName;
 	}
 	
@@ -47,7 +47,7 @@ public class Function implements Parsable, Expression {
 	 * @return An {@link Function}, as parsed from the current input.
 	 */
 	public static Function parse(Parser parser) {
-		Stack<Identifier> arguments = new Stack<Identifier>();
+		Stack<String> arguments = new Stack<String>();
 		parser.expect(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE), "Expected beginning of function.");
 		if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE))) {
 			Token switchExpressionToken = parser.current(2);
@@ -55,8 +55,8 @@ public class Function implements Parsable, Expression {
 			Expression switchBodyExpression = switchBody.getExpression();
 			if(switchBodyExpression instanceof Identifier) {
 				Identifier argumentName = (Identifier)switchBodyExpression;
-				if(argumentName.getModules().length == 0) {
-					return new Function(argumentName, switchBody);
+				if(argumentName.isUnqualified()) {
+					return new Function(argumentName.getName(), switchBody);
 				} else {
 					throw new ParserException("Switch function argument must not be qualified.", switchExpressionToken);
 				}
@@ -67,8 +67,8 @@ public class Function implements Parsable, Expression {
 		do {
 			Token argumentToken = parser.current(1);
 			Identifier argumentName = Identifier.parse(parser);
-			if(argumentName.getModules().length == 0) {
-				arguments.push(argumentName);
+			if(argumentName.isUnqualified()) {
+				arguments.push(argumentName.getName());
 			} else {
 				throw new ParserException("Function argument must not be qualified.", argumentToken);
 			}

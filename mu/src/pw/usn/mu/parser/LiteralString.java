@@ -5,7 +5,7 @@ import pw.usn.mu.tokenizer.LiteralStringToken;
 /**
  * Represents a string literal in mu source code.
  */
-public class LiteralString implements Parsable, Expression {
+public class LiteralString extends Expression {
 	/**
 	 * The delimiter used to signal the start and end of a literal string in source code.
 	 */

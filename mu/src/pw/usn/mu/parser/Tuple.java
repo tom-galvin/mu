@@ -8,7 +8,7 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents an unnamed tuple of values.
  */
-public class Tuple implements Expression {
+public class Tuple extends Expression {
 	private Expression[] values;
 	
 	/**
@@ -52,7 +52,7 @@ public class Tuple implements Expression {
 	public static Expression parse(Parser parser) {
 		List<Expression> expressions = new ArrayList<Expression>(1);
 		do {
-			expressions.add(ExpressionGrammar.parseBooleanPrecedence(parser));
+			expressions.add(Expression.parseBound(parser));
 		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.COMMA)));
 		if(expressions.size() == 1) {
 			return expressions.get(0);

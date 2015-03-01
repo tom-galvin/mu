@@ -8,7 +8,7 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents a switch ({@code ?}) expression.
  */
-public class Switch implements Expression {
+public class Switch extends Expression {
 	private Expression expression;
 	private SwitchBranch[] branches;
 	
@@ -21,8 +21,9 @@ public class Switch implements Expression {
 		this.expression = expression;
 		if(branches == null || branches.length < 1) {
 			throw new NullPointerException("Switch statement must have at least one branch.");
+		} else {
+			this.branches = branches;
 		}
-		this.branches = branches;
 	}
 	
 	/**
@@ -58,7 +59,7 @@ public class Switch implements Expression {
 	 */
 	public static Switch parse(Parser parser) {
 		parser.expect(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE), "Expected question mark to begin switch statement.");
-		Expression input = ExpressionGrammar.parseAtomic(parser);
+		Expression input = Expression.parseAtomic(parser);
 		List<SwitchBranch> branches = new ArrayList<SwitchBranch>();
 		do {
 			branches.add(SwitchBranch.parse(parser));

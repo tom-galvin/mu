@@ -12,16 +12,16 @@ import pw.usn.mu.tokenizer.Token;
 /**
  * Represents a collection of functions or values.
  */
-public class Module extends Expression {
-	private Map<String, Expression> definitions;
-	private Map<String, Module> submodules;
+public class ModuleNode extends Node {
+	private Map<String, Node> definitions;
+	private Map<String, ModuleNode> submodules;
 	
 	/**
 	 * Initializes a new empty Module.
 	 */
-	public Module() {
-		this.definitions = new HashMap<String, Expression>();
-		this.submodules = new HashMap<String, Module>();
+	public ModuleNode() {
+		this.definitions = new HashMap<String, Node>();
+		this.submodules = new HashMap<String, ModuleNode>();
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class Module extends Expression {
 	 * @return The value of the definition bound to {@code identifier} within
 	 * this module.
 	 */
-	public Expression getDefinition(String identifier) {
+	public Node getDefinition(String identifier) {
 		if(definitions.containsKey(identifier)) {
 			return definitions.get(identifier);
 		} else {
@@ -70,7 +70,7 @@ public class Module extends Expression {
 	 * @param identifier The identifier of the submodule to get.
 	 * @return The submodule named {@code identifier} within this module.
 	 */
-	public Module getSubmodule(String identifier) {
+	public ModuleNode getSubmodule(String identifier) {
 		if(submodules.containsKey(identifier)) {
 			return submodules.get(identifier);
 		} else {
@@ -84,7 +84,7 @@ public class Module extends Expression {
 	 * @param identifier The name to which to bind the given value.
 	 * @param value The value to bind to {@code identifier}.
 	 */
-	public void addDefinition(String identifier, Expression value) {
+	public void addDefinition(String identifier, Node value) {
 		if(!definitions.containsKey(identifier)) {
 			definitions.put(identifier, value);
 		} else {
@@ -98,7 +98,7 @@ public class Module extends Expression {
 	 * @param identifier The name to which to associate with the given submodule.
 	 * @param module The submodule to be named {@code identifier} in this module.
 	 */
-	public void addSubmodule(String identifier, Module module) {
+	public void addSubmodule(String identifier, ModuleNode module) {
 		if(!submodules.containsKey(identifier)) {
 			submodules.put(identifier, module);
 		} else {
@@ -110,25 +110,25 @@ public class Module extends Expression {
 	/**
 	 * Parses the content of a module from the given parser state.
 	 * @param parser The parser enumerator to use.
-	 * @return A {@link Module}, as parsed from the current input.
+	 * @return A {@link ModuleNode}, as parsed from the current input.
 	 */
-	public static Module parse(Parser parser) {
-		Module module = new Module();
+	public static ModuleNode parse(Parser parser) {
+		ModuleNode module = new ModuleNode();
 		while(parser.test(token -> token instanceof IdentifierToken) ||
 		      parser.test(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
 			Token identifierToken;
-			Identifier identifier;
+			IdentifierNode identifier;
 			boolean isSymbolIdentifer;
 			
 			if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
 				parser.expect(token -> token instanceof OperatorToken, "Expected operator symbol in operator definition.");
 				identifierToken = parser.current();
-				identifier = new Identifier(((OperatorToken)identifierToken).getOperator());
+				identifier = new IdentifierNode(((OperatorToken)identifierToken).getOperator());
 				parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Expected closing bracket after operator symbol.");
 				isSymbolIdentifer = true;
 			} else {
 				identifierToken = parser.current(1);
-				identifier = Identifier.parse(parser);
+				identifier = IdentifierNode.parse(parser);
 				if(!identifier.isUnqualified()) {
 					throw new ParserException("Module definition cannot be qualified.", identifierToken);
 				}
@@ -143,11 +143,11 @@ public class Module extends Expression {
 				}
 				parser.next();
 				parser.next();
-				Module submodule = Module.parse(parser);
+				ModuleNode submodule = ModuleNode.parse(parser);
 				parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Expected closing bracket to end module.");
 				module.addSubmodule(identifier.getName(), submodule);
 			} else {
-				Expression expression = Expression.parse(parser);
+				Node expression = Node.parse(parser);
 				module.addDefinition(identifier.getName(), expression);
 			}
 			parser.expect(

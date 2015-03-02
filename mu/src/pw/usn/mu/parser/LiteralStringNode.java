@@ -5,7 +5,7 @@ import pw.usn.mu.tokenizer.LiteralStringToken;
 /**
  * Represents a string literal in mu source code.
  */
-public class LiteralString extends Expression {
+public class LiteralStringNode extends Node {
 	/**
 	 * The delimiter used to signal the start and end of a literal string in source code.
 	 */
@@ -16,7 +16,7 @@ public class LiteralString extends Expression {
 	 * Initializes a new LiteralString with the given value.
 	 * @param value The value of the string represented by this literal.
 	 */
-	public LiteralString(String value) {
+	public LiteralStringNode(String value) {
 		this.value = value;
 	}
 	
@@ -33,8 +33,8 @@ public class LiteralString extends Expression {
 	 * @param parser The parser enumerator to use.
 	 * @return A string literal, as parsed from the current input.
 	 */
-	public static LiteralString parse(Parser parser) {
+	public static LiteralStringNode parse(Parser parser) {
 		parser.expect(token -> token instanceof LiteralStringToken, "String literal expected.");
-		return new LiteralString(((LiteralStringToken)parser.current()).getValue());
+		return new LiteralStringNode(((LiteralStringToken)parser.current()).getValue());
 	}
 }

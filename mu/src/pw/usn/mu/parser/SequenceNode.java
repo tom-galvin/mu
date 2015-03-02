@@ -8,14 +8,14 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents a sequence literal in mu source code.
  */
-public class Sequence extends Expression {
-	private Expression[] values;
+public class SequenceNode extends Node {
+	private Node[] values;
 	
 	/**
 	 * Initializes a new Sequence with the given {@code values}.
 	 * @param values The values contained within this sequence.
 	 */
-	public Sequence(Expression... values) {
+	public SequenceNode(Node... values) {
 		if(values.length > 1) {
 			this.values = values;
 		} else {
@@ -37,28 +37,28 @@ public class Sequence extends Expression {
 	 * @param index The position in the sequence of the value to get.
 	 * @return The specified value in the suple.
 	 */
-	public Expression getValues(int index) {
+	public Node getValues(int index) {
 		return values[index];
 	}
 	
 	/**
 	 * Parses a sequence from the given parser state.
 	 * @param parser The parser enumerator to use.
-	 * @return A {@link Sequence}, as parsed from the current input.
+	 * @return A {@link SequenceNode}, as parsed from the current input.
 	 */
-	public static Sequence parse(Parser parser) {
+	public static SequenceNode parse(Parser parser) {
 		parser.expect(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_OPEN), "Expected start of sequence.");
 		if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_CLOSE))) {
-			return new Sequence();
+			return new SequenceNode();
 		} else {
-			List<Expression> expressions = new ArrayList<Expression>();
+			List<Node> expressions = new ArrayList<Node>();
 			do {
-				expressions.add(Expression.parseBound(parser));
+				expressions.add(Node.parseBound(parser));
 			} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.COMMA)));
 			parser.expect(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_CLOSE), "Expected end of sequence.");
-			Expression[] expressionsArray = new Expression[expressions.size()];
+			Node[] expressionsArray = new Node[expressions.size()];
 			expressions.toArray(expressionsArray);
-			return new Sequence(expressionsArray);
+			return new SequenceNode(expressionsArray);
 		}
 	}
 }

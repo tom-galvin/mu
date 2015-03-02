@@ -8,14 +8,14 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents an unnamed tuple of values.
  */
-public class Tuple extends Expression {
-	private Expression[] values;
+public class TupleNode extends Node {
+	private Node[] values;
 	
 	/**
 	 * Initializes a new untagged Tuple with the given {@code values}.
 	 * @param values The values contained within this tuple.
 	 */
-	public Tuple(Expression... values) {
+	public TupleNode(Node... values) {
 		if(values.length > 1) {
 			this.values = values;
 		} else {
@@ -37,7 +37,7 @@ public class Tuple extends Expression {
 	 * @param index The position in the tuple of the value to get.
 	 * @return The specified value in the suple.
 	 */
-	public Expression getValues(int index) {
+	public Node getValues(int index) {
 		return values[index];
 	}
 	
@@ -45,21 +45,21 @@ public class Tuple extends Expression {
 	 * Parses a tuple from the given parser state.
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input. This method must
-	 * return an {@link Expression} rather than a concrete {@link Tuple} as
+	 * return an {@link Node} rather than a concrete {@link TupleNode} as
 	 * the tuple may have a length of one, in which case the value returned is
 	 * the first (and only) value in the tuple.
 	 */
-	public static Expression parse(Parser parser) {
-		List<Expression> expressions = new ArrayList<Expression>(1);
+	public static Node parse(Parser parser) {
+		List<Node> expressions = new ArrayList<Node>(1);
 		do {
-			expressions.add(Expression.parseBound(parser));
+			expressions.add(Node.parseBound(parser));
 		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.COMMA)));
 		if(expressions.size() == 1) {
 			return expressions.get(0);
 		} else {
-			Expression[] expressionsArray = new Expression[expressions.size()];
+			Node[] expressionsArray = new Node[expressions.size()];
 			expressions.toArray(expressionsArray);
-			return new Tuple(expressionsArray);
+			return new TupleNode(expressionsArray);
 		}
 	}
 }

@@ -6,7 +6,7 @@ import pw.usn.mu.tokenizer.LiteralIntTokenBase;
 /**
  * Represents an int literal in mu source code.
  */
-public class LiteralInt extends Expression {
+public class LiteralIntNode extends Node {
 	private int value;
 	private LiteralIntTokenBase originalBase;
 	
@@ -18,7 +18,7 @@ public class LiteralInt extends Expression {
 	 * source from which the original {@link pw.usn.mu.tokenizer.LiteralIntToken
 	 * LiteralIntToken} was tokenized.
 	 */
-	public LiteralInt(int value, LiteralIntTokenBase originalBase) {
+	public LiteralIntNode(int value, LiteralIntTokenBase originalBase) {
 		this.value = value;
 		this.originalBase = originalBase;
 	}
@@ -27,7 +27,7 @@ public class LiteralInt extends Expression {
 	 * Initializes a new LiteralInt with the given value.
 	 * @param value The value of the int literal.
 	 */
-	public LiteralInt(int value) {
+	public LiteralIntNode(int value) {
 		this(value, LiteralIntTokenBase.DECIMAL);
 	}
 	
@@ -54,9 +54,9 @@ public class LiteralInt extends Expression {
 	 * @param parser The parser enumerator to use.
 	 * @return An int literal, as parsed from the current input.
 	 */
-	public static LiteralInt parse(Parser parser) {
+	public static LiteralIntNode parse(Parser parser) {
 		parser.expect(token -> token instanceof LiteralIntToken, "Int literal expected.");
 		LiteralIntToken current = (LiteralIntToken)parser.current();
-		return new LiteralInt(current.getValue(), current.getBase());
+		return new LiteralIntNode(current.getValue(), current.getBase());
 	}
 }

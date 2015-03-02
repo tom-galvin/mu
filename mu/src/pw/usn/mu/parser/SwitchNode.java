@@ -8,16 +8,16 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents a switch ({@code ?}) expression.
  */
-public class Switch extends Expression {
-	private Expression expression;
-	private SwitchBranch[] branches;
+public class SwitchNode extends Node {
+	private Node expression;
+	private SwitchBranchNode[] branches;
 	
 	/**
 	 * Initializes a new Switch expression with the given branches.
 	 * @param expression The expression to switch on.
 	 * @param branches The branches in this switch statement.
 	 */
-	public Switch(Expression expression, SwitchBranch... branches) {
+	public SwitchNode(Node expression, SwitchBranchNode... branches) {
 		this.expression = expression;
 		if(branches == null || branches.length < 1) {
 			throw new NullPointerException("Switch statement must have at least one branch.");
@@ -40,7 +40,7 @@ public class Switch extends Expression {
 	 * @param index The branch to get.
 	 * @return The specified branch in this switch statement.
 	 */
-	public SwitchBranch getBranch(int index) {
+	public SwitchBranchNode getBranch(int index) {
 		return branches[index];
 	}
 	
@@ -48,24 +48,24 @@ public class Switch extends Expression {
 	 * Gets the expression that this expression is switching on.
 	 * @return The input expression for this switch block.
 	 */
-	public Expression getExpression() {
+	public Node getExpression() {
 		return expression;
 	}
 	
 	/**
 	 * Parses a switch statement from the given parser state.
 	 * @param parser The parser enumerator to use.
-	 * @return A {@link Switch} expression, as parsed from the current input.
+	 * @return A {@link SwitchNode} expression, as parsed from the current input.
 	 */
-	public static Switch parse(Parser parser) {
+	public static SwitchNode parse(Parser parser) {
 		parser.expect(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE), "Expected question mark to begin switch statement.");
-		Expression input = Expression.parseAtomic(parser);
-		List<SwitchBranch> branches = new ArrayList<SwitchBranch>();
+		Node input = Node.parseAtomic(parser);
+		List<SwitchBranchNode> branches = new ArrayList<SwitchBranchNode>();
 		do {
-			branches.add(SwitchBranch.parse(parser));
+			branches.add(SwitchBranchNode.parse(parser));
 		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.SEPARATOR)));
-		SwitchBranch[] branchesArray = new SwitchBranch[branches.size()];
+		SwitchBranchNode[] branchesArray = new SwitchBranchNode[branches.size()];
 		branches.toArray(branchesArray);
-		return new Switch(input, branchesArray);
+		return new SwitchNode(input, branchesArray);
 	}
 }

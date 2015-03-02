@@ -2,7 +2,7 @@ package pw.usn.mu.tokenizer;
 
 import java.util.regex.Pattern;
 
-import pw.usn.mu.parser.LiteralString;
+import pw.usn.mu.parser.LiteralStringNode;
 
 /**
  * Represents a token containing a string literal.
@@ -34,7 +34,7 @@ public class LiteralStringToken extends Token {
 	 * @return A pattern that can be used by a tokenizer rule for matching literal string tokens.
 	 */
 	public static Pattern getLiteralStringPattern() {
-		String stringDelimiterPattern = Pattern.quote(LiteralString.LITERAL_STRING_DELIMITER);
+		String stringDelimiterPattern = Pattern.quote(LiteralStringNode.LITERAL_STRING_DELIMITER);
 		return Pattern.compile(
 				stringDelimiterPattern + "(.*?)" + stringDelimiterPattern,
 				Pattern.DOTALL);
@@ -43,8 +43,8 @@ public class LiteralStringToken extends Token {
 	@Override
 	public String getInformation() {
 		return String.format("%s%s%s",
-				LiteralString.LITERAL_STRING_DELIMITER,
+				LiteralStringNode.LITERAL_STRING_DELIMITER,
 				value,
-				LiteralString.LITERAL_STRING_DELIMITER);
+				LiteralStringNode.LITERAL_STRING_DELIMITER);
 	}
 }

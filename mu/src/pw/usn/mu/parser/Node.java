@@ -12,14 +12,14 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
  * things like function application, functions themselves, and identifiers,
  * but not things like modules.
  */
-public abstract class Expression implements Parsable {
+public abstract class Node implements Parsable {
 	/**
 	 * Parses an full expression from the given parser state.
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input.
 	 */
-	public static Expression parse(Parser parser) {
-		return Tuple.parse(parser);
+	public static Node parse(Parser parser) {
+		return TupleNode.parse(parser);
 	}
 	
 	/**
@@ -29,7 +29,7 @@ public abstract class Expression implements Parsable {
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input.
 	 */
-	public static Expression parseBound(Parser parser) {
+	public static Node parseBound(Parser parser) {
 		return parseBooleanPrecedence(parser);
 	}
 	
@@ -39,22 +39,22 @@ public abstract class Expression implements Parsable {
 	 * @param operator The operator to apply.
 	 * @param left The left-hand side of the operation.
 	 * @param right The right-hand side of the operation.
-	 * @return An {@link Application} syntax tree node representing the application of the
+	 * @return An {@link ApplicationNode} syntax tree node representing the application of the
 	 * given {@code operator} with the given {@code left} and {@code right} operands.
 	 */
-	private static Application createOperationApplication(Expression operator, Expression left, Expression right) {
-		return new Application(new Application(operator, left), right); 
+	private static ApplicationNode createOperationApplication(Node operator, Node left, Node right) {
+		return new ApplicationNode(new ApplicationNode(operator, left), right); 
 	}
 	/**
 	 * Creates an expression representing the application of an unary operator with an
 	 * operand.
 	 * @param operator The operator to apply.
 	 * @param operand The operand of the operation.
-	 * @return An {@link Application} syntax tree node representing the application of the
+	 * @return An {@link ApplicationNode} syntax tree node representing the application of the
 	 * given {@code operator} with the given {@code operand}.
 	 */
-	private static Application createOperationApplication(Expression operator, Expression operand) {
-		return new Application(operator, operand); 
+	private static ApplicationNode createOperationApplication(Node operator, Node operand) {
+		return new ApplicationNode(operator, operand); 
 	}
 	
 	/**
@@ -63,23 +63,23 @@ public abstract class Expression implements Parsable {
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input.
 	 */
-	public static Expression parseAtomic(Parser parser) {
+	public static Node parseAtomic(Parser parser) {
 		if(parser.test(token -> token instanceof LiteralStringToken)) {
-			return LiteralString.parse(parser);
+			return LiteralStringNode.parse(parser);
 		} else if(parser.test(token -> token instanceof LiteralIntToken)) {
-			return LiteralInt.parse(parser);
+			return LiteralIntNode.parse(parser);
 		} else if(parser.test(token -> token instanceof IdentifierToken)) {
-			return Identifier.parse(parser);
+			return IdentifierNode.parse(parser);
 		} else if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_OPEN))) {
-			return Sequence.parse(parser);
+			return SequenceNode.parse(parser);
 		} else if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
-			Expression expression;
+			Node expression;
 			if(parser.test(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE))) {
-				expression = Function.parse(parser);
+				expression = FunctionNode.parse(parser);
 			} else if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE))) {
-				expression = Switch.parse(parser);
+				expression = SwitchNode.parse(parser);
 			} else {
-				expression = Expression.parse(parser);
+				expression = Node.parse(parser);
 			}
 			parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Closing parenthesis expected.");
 			return expression;
@@ -93,11 +93,11 @@ public abstract class Expression implements Parsable {
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input.
 	 */
-	private static Expression parseBooleanPrecedence(Parser parser) {
-		Expression left = parseEqualityPrecedence(parser);
+	private static Node parseBooleanPrecedence(Parser parser) {
+		Node left = parseEqualityPrecedence(parser);
 		while(parser.accept(token -> token.isOperatorToken(OperatorTokenType.BOOLEAN))) {
 			String operator = ((OperatorToken)parser.current()).getOperator();
-			left = createOperationApplication(new Identifier(operator), left, parseEqualityPrecedence(parser));
+			left = createOperationApplication(new IdentifierNode(operator), left, parseEqualityPrecedence(parser));
 		}
 		return left;
 	}
@@ -107,11 +107,11 @@ public abstract class Expression implements Parsable {
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input.
 	 */
-	private static Expression parseEqualityPrecedence(Parser parser) {
-		Expression left = parseSummationPrecedence(parser);
+	private static Node parseEqualityPrecedence(Parser parser) {
+		Node left = parseSummationPrecedence(parser);
 		while(parser.accept(token -> token.isOperatorToken(OperatorTokenType.EQUALITY))) {
 			String operator = ((OperatorToken)parser.current()).getOperator();
-			left = createOperationApplication(new Identifier(operator), left, parseSummationPrecedence(parser));
+			left = createOperationApplication(new IdentifierNode(operator), left, parseSummationPrecedence(parser));
 		}
 		return left;
 	}
@@ -121,11 +121,11 @@ public abstract class Expression implements Parsable {
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input.
 	 */
-	private static Expression parseSummationPrecedence(Parser parser) {
-		Expression left = parseProductionPrecedence(parser);
+	private static Node parseSummationPrecedence(Parser parser) {
+		Node left = parseProductionPrecedence(parser);
 		while(parser.accept(token -> token.isOperatorToken(OperatorTokenType.SUM))) {
 			String operator = ((OperatorToken)parser.current()).getOperator();
-			left = createOperationApplication(new Identifier(operator), left, parseProductionPrecedence(parser));
+			left = createOperationApplication(new IdentifierNode(operator), left, parseProductionPrecedence(parser));
 		}
 		return left;
 	}
@@ -135,11 +135,11 @@ public abstract class Expression implements Parsable {
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input.
 	 */
-	private static Expression parseProductionPrecedence(Parser parser) {
-		Expression left = parseUnaryPrecedence(parser);
+	private static Node parseProductionPrecedence(Parser parser) {
+		Node left = parseUnaryPrecedence(parser);
 		while(parser.accept(token -> token.isOperatorToken(OperatorTokenType.PRODUCT))) {
 			String operator = ((OperatorToken)parser.current()).getOperator();
-			left = createOperationApplication(new Identifier(operator), left, parseUnaryPrecedence(parser));
+			left = createOperationApplication(new IdentifierNode(operator), left, parseUnaryPrecedence(parser));
 		}
 		return left;
 	}
@@ -149,12 +149,12 @@ public abstract class Expression implements Parsable {
 	 * @param parser The parser enumerator to use.
 	 * @return An expression, as parsed from the current input.
 	 */
-	private static Expression parseUnaryPrecedence(Parser parser) {
+	private static Node parseUnaryPrecedence(Parser parser) {
 		if(parser.accept(token -> token.isOperatorToken(OperatorTokenType.UNARY))) {
 			String operator = ((OperatorToken)parser.current()).getOperator();
-			return createOperationApplication(new Identifier(operator), parseUnaryPrecedence(parser));
+			return createOperationApplication(new IdentifierNode(operator), parseUnaryPrecedence(parser));
 		} else {
-			return Application.parse(parser);
+			return ApplicationNode.parse(parser);
 		}
 	}
 }

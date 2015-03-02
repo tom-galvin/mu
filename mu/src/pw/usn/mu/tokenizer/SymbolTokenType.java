@@ -2,7 +2,7 @@ package pw.usn.mu.tokenizer;
 
 import java.util.regex.Pattern;
 
-import pw.usn.mu.parser.Identifier;
+import pw.usn.mu.parser.IdentifierNode;
 
 /**
  * Represents the type of symbol represented by a {@link SymbolToken}.
@@ -29,7 +29,7 @@ public enum SymbolTokenType {
 	 * Identifier#QUALIFIER_SYMBOL}), used for specifying the parent module
 	 * that contains an identifier.
 	 */
-	NAMESPACE_QUALIFIER(String.valueOf(Identifier.QUALIFIER_SYMBOL)),
+	NAMESPACE_QUALIFIER(String.valueOf(IdentifierNode.QUALIFIER_SYMBOL)),
 	/**
 	 * Represents the starting sigil for a function ({@code \}),
 	 * to be followed by an identifier name for an argument.

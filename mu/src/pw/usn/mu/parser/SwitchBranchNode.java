@@ -5,8 +5,8 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents a branch of a switch statement.
  */
-public class SwitchBranch extends Expression {
-	private Expression pattern, condition, result;
+public class SwitchBranchNode extends Node {
+	private Node pattern, condition, result;
 	
 	/**
 	 * Initialize a new SwitchBranch with the given {@code pattern} to match, {@code condition} to
@@ -16,7 +16,7 @@ public class SwitchBranch extends Expression {
 	 * @param condition The condition to satisfy.
 	 * @param result The result of this branch.
 	 */
-	public SwitchBranch(Expression pattern, Expression condition, Expression result) {
+	public SwitchBranchNode(Node pattern, Node condition, Node result) {
 		this.pattern = pattern;
 		this.condition = condition;
 		this.result = result;
@@ -28,9 +28,9 @@ public class SwitchBranch extends Expression {
 	 * @param pattern The pattern to be matched for this case.
 	 * @param result The result of this branch.
 	 */
-	public SwitchBranch(Expression pattern, Expression result) {
+	public SwitchBranchNode(Node pattern, Node result) {
 		this.pattern = pattern;
-		this.condition = new Identifier("true");
+		this.condition = new IdentifierNode("true");
 		this.result = result;
 	}
 	
@@ -38,7 +38,7 @@ public class SwitchBranch extends Expression {
 	 * Gets the pattern to match for this switch branch.
 	 * @return The pattern to match.
 	 */
-	public Expression getPattern() {
+	public Node getPattern() {
 		return pattern;
 	}
 	
@@ -46,7 +46,7 @@ public class SwitchBranch extends Expression {
 	 * Gets the condition to satisfy for this switch branch.
 	 * @return The condition to satisfy.
 	 */
-	public Expression getCondition() {
+	public Node getCondition() {
 		return condition;
 	}
 	
@@ -54,30 +54,30 @@ public class SwitchBranch extends Expression {
 	 * Gets the result of evaluating this switch branch.
 	 * @return The result of this branch.
 	 */
-	public Expression getResult() {
+	public Node getResult() {
 		return result;
 	}
 	
 	/**
 	 * Parses a switch branch from the given parser state.
 	 * @param parser The parser enumerator to use.
-	 * @return A {@link SwitchBranch}, as parsed from the current input.
+	 * @return A {@link SwitchBranchNode}, as parsed from the current input.
 	 */
-	public static SwitchBranch parse(Parser parser) {
-		Expression pattern = Expression.parse(parser);
+	public static SwitchBranchNode parse(Parser parser) {
+		Node pattern = Node.parse(parser);
 		if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE))) {
-			Expression condition = Expression.parse(parser);
+			Node condition = Node.parse(parser);
 			parser.expect(
 					token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN),
 					"Expected forward-arrow after branch condition.");
-			Expression result = Expression.parse(parser);
-			return new SwitchBranch(pattern, condition, result);
+			Node result = Node.parse(parser);
+			return new SwitchBranchNode(pattern, condition, result);
 		} else {
 			parser.expect(
 					token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN),
 					"Expected forward-arrow after branch pattern.");
-			Expression result = Expression.parse(parser);
-			return new SwitchBranch(pattern, result);
+			Node result = Node.parse(parser);
+			return new SwitchBranchNode(pattern, result);
 		}
 	}
 }

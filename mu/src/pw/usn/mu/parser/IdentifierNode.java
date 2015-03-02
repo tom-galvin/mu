@@ -10,7 +10,7 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
 /**
  * Represents an (optionally qualified) identifier in mu source code.
  */
-public class Identifier extends Expression {
+public class IdentifierNode extends Node {
 	/**
 	 * The symbol used to qualify identifiers with module names.
 	 */
@@ -18,16 +18,16 @@ public class Identifier extends Expression {
 	private String[] modules;
 	private String name;
 	
-	private Identifier() {
+	private IdentifierNode() {
 		
 	}
 	
 	/**
 	 * Initializes a new Identifier with the specified identifier components.
 	 * @param names The components (normally separated by {@link
-	 * Identifier#QUALIFIER_SYMBOL}) comprising this identifier.
+	 * IdentifierNode#QUALIFIER_SYMBOL}) comprising this identifier.
 	 */
-	public Identifier(String... names) {
+	public IdentifierNode(String... names) {
 		this();
 		if(names.length == 0) {
 			throw new IllegalArgumentException("Must specify at least one component of identifier.");
@@ -43,9 +43,9 @@ public class Identifier extends Expression {
 	 * name removed.
 	 * @return A copy of this identifier with the head stripped.
 	 */
-	public Identifier tail() {
+	public IdentifierNode tail() {
 		if(isUnqualified()) {
-			Identifier tailIdentifier = new Identifier();
+			IdentifierNode tailIdentifier = new IdentifierNode();
 			tailIdentifier.name = name;
 			tailIdentifier.modules = new String[modules.length - 1];
 			System.arraycopy(modules, 1, tailIdentifier.modules, 0, tailIdentifier.modules.length);
@@ -76,8 +76,8 @@ public class Identifier extends Expression {
 	 * @param qualifyingIdentifier The identifier to qualify with.
 	 * @return THe resulting qualified identifier.
 	 */
-	public Identifier qualify(Identifier qualifyingIdentifier) {
-		Identifier newIdentifier = new Identifier();
+	public IdentifierNode qualify(IdentifierNode qualifyingIdentifier) {
+		IdentifierNode newIdentifier = new IdentifierNode();
 		newIdentifier.modules = new String[qualifyingIdentifier.modules.length + 1 + modules.length];
 		
 		System.arraycopy(qualifyingIdentifier.modules, 0, newIdentifier.modules, 0, qualifyingIdentifier.modules.length);
@@ -94,7 +94,7 @@ public class Identifier extends Expression {
 	 * @param identifier The identifier string, as it appears in the source
 	 * code, representing this identifier.
 	 */
-	public Identifier(String identifier) {
+	public IdentifierNode(String identifier) {
 		this(identifier.split(Pattern.quote(QUALIFIER_SYMBOL)));
 	}
 	
@@ -132,7 +132,7 @@ public class Identifier extends Expression {
 	 * @param parser The parser enumerator to use.
 	 * @return An identifier, as parsed from the current input.
 	 */
-	public static Identifier parse(Parser parser) {
+	public static IdentifierNode parse(Parser parser) {
 		List<String> identifierParts = new ArrayList<String>();
 		do {
 			parser.expect(token -> token instanceof IdentifierToken, "Identifier expected.");
@@ -140,7 +140,7 @@ public class Identifier extends Expression {
 		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.NAMESPACE_QUALIFIER)));
 		String[] partsArray = new String[identifierParts.size()];
 		identifierParts.toArray(partsArray);
-		return new Identifier(partsArray);
+		return new IdentifierNode(partsArray);
 	}
 	
 	@Override
@@ -169,8 +169,8 @@ public class Identifier extends Expression {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(obj != null && obj instanceof Identifier) {
-			Identifier identifier = (Identifier)obj;
+		if(obj != null && obj instanceof IdentifierNode) {
+			IdentifierNode identifier = (IdentifierNode)obj;
 			if(!identifier.name.equals(this.name)) {
 				return false;
 			}

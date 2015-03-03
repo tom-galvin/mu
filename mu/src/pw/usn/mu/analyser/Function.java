@@ -2,20 +2,24 @@ package pw.usn.mu.analyser;
 
 import pw.usn.mu.parser.FunctionNode;
 import pw.usn.mu.parser.IdentifierNode;
+import pw.usn.mu.tokenizer.Location;
 
 /**
  * Represents a first-class function in a mu program.
  */
-public class Function implements Expression {
+public class Function extends Expression {
 	private Value argument;
 	private Expression body;
 	
 	/**
 	 * Initializes a new Function.
+	 * @param location The original location, in a source, of the code that represents
+	 * this expression.
 	 * @param argument The value passed to the function.
 	 * @param body The function body of the new function.
 	 */
-	public Function(Value argument, Expression body) {
+	public Function(Location location, Value argument, Expression body) {
+		super(location);
 		this.argument = argument;
 		this.body = body;
 	}
@@ -52,14 +56,14 @@ public class Function implements Expression {
 			public Reference resolve(IdentifierNode identifier) {
 				if(identifier.isUnqualified() &&
 						identifier.getName().equals(node.getArgumentName())) {
-					return argument.newReference();
+					return argument.newReference(identifier.getLocation());
 				} else {
 					return super.resolve(identifier);
 				}
 			}
 		};
 		
-		return new Function(
+		return new Function(node.getLocation(),
 				argument,
 				Expression.analyse(functionContext, node.getBody()));
 	}

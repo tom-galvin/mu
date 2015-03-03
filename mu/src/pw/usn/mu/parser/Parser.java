@@ -2,6 +2,7 @@ package pw.usn.mu.parser;
 
 import java.util.function.Predicate;
 
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.Token;
 
 /**
@@ -133,10 +134,13 @@ public class Parser {
 	 * @param condition The condition that the next token must satisfy.
 	 * @param errorMessage If the conditions are not satisfied, the error message of the
 	 * {@link ParserException} that will be thrown.
+	 * @returns The location of the token that was successfully accepted.
 	 */
-	public void expect(Predicate<Token> condition, String errorMessage) {
+	public Location expect(Predicate<Token> condition, String errorMessage) {
 		if(!accept(condition)) {
 			throw new ParserException(errorMessage, current(1));
+		} else {
+			return current().getLocation();
 		}
 	}
 	

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import pw.usn.mu.tokenizer.IdentifierToken;
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.OperatorToken;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 import pw.usn.mu.tokenizer.Token;
@@ -18,14 +19,17 @@ public class ModuleNode extends Node {
 	
 	/**
 	 * Initializes a new empty Module.
+	 * @param location The location of the AST node in a parsed input source.
 	 */
-	public ModuleNode() {
+	public ModuleNode(Location location) {
+		super(location);
 		this.definitions = new HashMap<String, Node>();
 		this.submodules = new HashMap<String, ModuleNode>();
 	}
 	
 	/**
 	 * Gets an array of the names of all definitions in this module.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @return The names of all (non-module) definitions defined within
 	 * this module, as an array.
 	 */
@@ -109,11 +113,13 @@ public class ModuleNode extends Node {
 	
 	/**
 	 * Parses the content of a module from the given parser state.
+	 * @param identifierLocation The location of the identifier representing this
+	 * module within the source file.
 	 * @param parser The parser enumerator to use.
 	 * @return A {@link ModuleNode}, as parsed from the current input.
 	 */
-	public static ModuleNode parse(Parser parser) {
-		ModuleNode module = new ModuleNode();
+	public static ModuleNode parse(Location identifierLocation, Parser parser) {
+		ModuleNode module = new ModuleNode(identifierLocation);
 		while(parser.test(token -> token instanceof IdentifierToken) ||
 		      parser.test(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
 			Token identifierToken;
@@ -123,7 +129,9 @@ public class ModuleNode extends Node {
 			if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
 				parser.expect(token -> token instanceof OperatorToken, "Expected operator symbol in operator definition.");
 				identifierToken = parser.current();
-				identifier = new IdentifierNode(((OperatorToken)identifierToken).getOperator());
+				identifier = new IdentifierNode(
+						identifierToken.getLocation(),
+						((OperatorToken)identifierToken).getOperator());
 				parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Expected closing bracket after operator symbol.");
 				isSymbolIdentifer = true;
 			} else {
@@ -143,7 +151,9 @@ public class ModuleNode extends Node {
 				}
 				parser.next();
 				parser.next();
-				ModuleNode submodule = ModuleNode.parse(parser);
+				ModuleNode submodule = ModuleNode.parse(
+						identifierToken.getLocation(),
+						parser);
 				parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Expected closing bracket to end module.");
 				module.addSubmodule(identifier.getName(), submodule);
 			} else {

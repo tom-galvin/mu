@@ -3,6 +3,7 @@ package pw.usn.mu.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**
@@ -13,9 +14,11 @@ public class TupleNode extends Node {
 	
 	/**
 	 * Initializes a new untagged Tuple with the given {@code values}.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param values The values contained within this tuple.
 	 */
-	public TupleNode(Node... values) {
+	public TupleNode(Location location, Node... values) {
+		super(location);
 		if(values.length > 1) {
 			this.values = values;
 		} else {
@@ -59,7 +62,11 @@ public class TupleNode extends Node {
 		} else {
 			Node[] expressionsArray = new Node[expressions.size()];
 			expressions.toArray(expressionsArray);
-			return new TupleNode(expressionsArray);
+			/*
+			 * Tuple doesn't really have a well-defined starting location, so just use the
+			 * location of the first member instead.
+			 */
+			return new TupleNode(expressionsArray[0].getLocation(), expressionsArray);
 		}
 	}
 }

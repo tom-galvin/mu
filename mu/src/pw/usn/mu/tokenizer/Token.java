@@ -11,7 +11,7 @@ public abstract class Token {
 	/**
 	 * Initializes a new Token read from the given {@link Source} at the given location.
 	 * @param location The location of the token.
-	 * the start of each row is column 0.
+	 * The start of each row is column 0.
 	 */
 	public Token(Location location) {
 		this.location = location;

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import pw.usn.mu.tokenizer.IdentifierToken;
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**
@@ -18,17 +19,21 @@ public class IdentifierNode extends Node {
 	private String[] modules;
 	private String name;
 	
-	private IdentifierNode() {
-		
+	/**
+	 * @param location The location of the AST node in a parsed input source.
+	 */
+	private IdentifierNode(Location location) {
+		super(location);
 	}
 	
 	/**
 	 * Initializes a new Identifier with the specified identifier components.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param names The components (normally separated by {@link
 	 * IdentifierNode#QUALIFIER_SYMBOL}) comprising this identifier.
 	 */
-	public IdentifierNode(String... names) {
-		this();
+	public IdentifierNode(Location location, String... names) {
+		this(location);
 		if(names.length == 0) {
 			throw new IllegalArgumentException("Must specify at least one component of identifier.");
 		} else {
@@ -39,13 +44,23 @@ public class IdentifierNode extends Node {
 	}
 	
 	/**
+	 * Initializes a new Identifier with the specified identifier string.
+	 * @param location The location of the AST node in a parsed input source.
+	 * @param identifier The identifier string, as it appears in the source
+	 * code, representing this identifier.
+	 */
+	public IdentifierNode(Location location, String identifier) {
+		this(location, identifier.split(Pattern.quote(QUALIFIER_SYMBOL)));
+	}
+	
+	/**
 	 * Creates a copy of this identifier with the first qualifying namespace
 	 * name removed.
 	 * @return A copy of this identifier with the head stripped.
 	 */
 	public IdentifierNode tail() {
 		if(isUnqualified()) {
-			IdentifierNode tailIdentifier = new IdentifierNode();
+			IdentifierNode tailIdentifier = new IdentifierNode(getLocation());
 			tailIdentifier.name = name;
 			tailIdentifier.modules = new String[modules.length - 1];
 			System.arraycopy(modules, 1, tailIdentifier.modules, 0, tailIdentifier.modules.length);
@@ -77,7 +92,7 @@ public class IdentifierNode extends Node {
 	 * @return THe resulting qualified identifier.
 	 */
 	public IdentifierNode qualify(IdentifierNode qualifyingIdentifier) {
-		IdentifierNode newIdentifier = new IdentifierNode();
+		IdentifierNode newIdentifier = new IdentifierNode(getLocation());
 		newIdentifier.modules = new String[qualifyingIdentifier.modules.length + 1 + modules.length];
 		
 		System.arraycopy(qualifyingIdentifier.modules, 0, newIdentifier.modules, 0, qualifyingIdentifier.modules.length);
@@ -87,15 +102,6 @@ public class IdentifierNode extends Node {
 		newIdentifier.name = name;
 		
 		return newIdentifier;
-	}
-	
-	/**
-	 * Initializes a new Identifier with the specified identifier string.
-	 * @param identifier The identifier string, as it appears in the source
-	 * code, representing this identifier.
-	 */
-	public IdentifierNode(String identifier) {
-		this(identifier.split(Pattern.quote(QUALIFIER_SYMBOL)));
 	}
 	
 	/**
@@ -134,13 +140,20 @@ public class IdentifierNode extends Node {
 	 */
 	public static IdentifierNode parse(Parser parser) {
 		List<String> identifierParts = new ArrayList<String>();
+		Location identifierLocation = null;
 		do {
-			parser.expect(token -> token instanceof IdentifierToken, "Identifier expected.");
+			Location identifierPartLocation = parser.expect(token -> token instanceof IdentifierToken, "Identifier expected.");
+			if(identifierLocation == null) {
+				/* The reported location of the identifier is the location of the first
+				 * token of the identifier.
+				 */
+				identifierLocation = identifierPartLocation;
+			}
 			identifierParts.add(((IdentifierToken)parser.current()).getIdentifier());
 		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.NAMESPACE_QUALIFIER)));
 		String[] partsArray = new String[identifierParts.size()];
 		identifierParts.toArray(partsArray);
-		return new IdentifierNode(partsArray);
+		return new IdentifierNode(identifierLocation, partsArray);
 	}
 	
 	@Override

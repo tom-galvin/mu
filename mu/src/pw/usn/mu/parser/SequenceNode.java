@@ -1,8 +1,9 @@
 package pw.usn.mu.parser;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**
@@ -13,9 +14,11 @@ public class SequenceNode extends Node {
 	
 	/**
 	 * Initializes a new Sequence with the given {@code values}.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param values The values contained within this sequence.
 	 */
-	public SequenceNode(Node... values) {
+	public SequenceNode(Location location, Node... values) {
+		super(location);
 		if(values.length > 1) {
 			this.values = values;
 		} else {
@@ -47,9 +50,9 @@ public class SequenceNode extends Node {
 	 * @return A {@link SequenceNode}, as parsed from the current input.
 	 */
 	public static SequenceNode parse(Parser parser) {
-		parser.expect(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_OPEN), "Expected start of sequence.");
+		Location sequenceLocation = parser.expect(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_OPEN), "Expected start of sequence.");
 		if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_CLOSE))) {
-			return new SequenceNode();
+			return new SequenceNode(sequenceLocation);
 		} else {
 			List<Node> expressions = new ArrayList<Node>();
 			do {
@@ -58,7 +61,7 @@ public class SequenceNode extends Node {
 			parser.expect(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_CLOSE), "Expected end of sequence.");
 			Node[] expressionsArray = new Node[expressions.size()];
 			expressions.toArray(expressionsArray);
-			return new SequenceNode(expressionsArray);
+			return new SequenceNode(sequenceLocation, expressionsArray);
 		}
 	}
 }

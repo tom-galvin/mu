@@ -7,11 +7,29 @@ import pw.usn.mu.parser.IdentifierNode;
 import pw.usn.mu.parser.LiteralIntNode;
 import pw.usn.mu.parser.LiteralStringNode;
 import pw.usn.mu.parser.Node;
+import pw.usn.mu.tokenizer.Location;
 
 /**
  * Represents an expression in a mu program.
  */
-public interface Expression {
+public abstract class Expression {
+	private Location location;
+	
+	/**
+	 * Initializes a new Expression with the given location in the original parsed source file.
+	 */
+	public Expression(Location location) {
+		this.location = location;
+	}
+	
+	/**
+	 * Gets the location of the source code representing this expression.
+	 * @return The location of the expression, as defined in a parsed input source.
+	 */
+	public final Location getLocation() {
+		return location;
+	}
+	
 	/**
 	 * Analyses the given {@code node} in the given context and creates an equivalent
 	 * {@link Expression}. The exact behaviour of this function will depend upon the
@@ -25,6 +43,9 @@ public interface Expression {
 	 *         x + 2);
 	 *     innerFunc x);
 	 * }</pre>
+	 * The two identifiers named {@code x} will represent different values, and the addition
+	 * operation inside {@code innerFunc} will return to the inner-most value named {@code
+	 * x}.
 	 * @param context The context in which {@code node} resides.
 	 * @param node The AST node to analyse.
 	 * @return An {@link Expression} representing the same program structure as {@code

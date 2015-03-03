@@ -3,6 +3,7 @@ package pw.usn.mu.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**
@@ -14,10 +15,12 @@ public class SwitchNode extends Node {
 	
 	/**
 	 * Initializes a new Switch expression with the given branches.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param expression The expression to switch on.
 	 * @param branches The branches in this switch statement.
 	 */
-	public SwitchNode(Node expression, SwitchBranchNode... branches) {
+	public SwitchNode(Location location, Node expression, SwitchBranchNode... branches) {
+		super(location);
 		this.expression = expression;
 		if(branches == null || branches.length < 1) {
 			throw new NullPointerException("Switch statement must have at least one branch.");
@@ -58,7 +61,7 @@ public class SwitchNode extends Node {
 	 * @return A {@link SwitchNode} expression, as parsed from the current input.
 	 */
 	public static SwitchNode parse(Parser parser) {
-		parser.expect(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE), "Expected question mark to begin switch statement.");
+		Location switchLocation = parser.expect(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE), "Expected question mark to begin switch statement.");
 		Node input = Node.parseAtomic(parser);
 		List<SwitchBranchNode> branches = new ArrayList<SwitchBranchNode>();
 		do {
@@ -66,6 +69,6 @@ public class SwitchNode extends Node {
 		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.SEPARATOR)));
 		SwitchBranchNode[] branchesArray = new SwitchBranchNode[branches.size()];
 		branches.toArray(branchesArray);
-		return new SwitchNode(input, branchesArray);
+		return new SwitchNode(switchLocation, input, branchesArray);
 	}
 }

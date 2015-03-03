@@ -3,18 +3,22 @@ package pw.usn.mu.analyser;
 import java.util.logging.Logger;
 
 import pw.usn.mu.parser.IdentifierNode;
+import pw.usn.mu.tokenizer.Location;
 
 /**
  * Represents a reference to a value in a mu program.
  */
-public class Reference implements Expression {
+public class Reference extends Expression {
 	private Value value;
 	
 	/**
 	 * Initialize a new reference to a {@link Value}.
+	 * @param location The original location, in a source, of the code that represents
+	 * this expression.
 	 * @param value The value to refer to.
 	 */
-	public Reference(Value value) {
+	public Reference(Location location, Value value) {
+		super(location);
 		this.value = value;
 	}
 	

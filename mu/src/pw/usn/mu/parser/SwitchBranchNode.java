@@ -1,5 +1,6 @@
 package pw.usn.mu.parser;
 
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**
@@ -12,11 +13,13 @@ public class SwitchBranchNode extends Node {
 	 * Initialize a new SwitchBranch with the given {@code pattern} to match, {@code condition} to
 	 * satisfy and {@code result} of the expression should the condition be satisfied for the given
 	 * pattern.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param pattern The pattern to be matched for this case.
 	 * @param condition The condition to satisfy.
 	 * @param result The result of this branch.
 	 */
-	public SwitchBranchNode(Node pattern, Node condition, Node result) {
+	public SwitchBranchNode(Location location, Node pattern, Node condition, Node result) {
+		super(location);
 		this.pattern = pattern;
 		this.condition = condition;
 		this.result = result;
@@ -25,13 +28,12 @@ public class SwitchBranchNode extends Node {
 	/**
 	 * Initialize a new SwitchBranch with the given {@code pattern} to match and {@code result} of
 	 * the expression should the input match the given pattern.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param pattern The pattern to be matched for this case.
 	 * @param result The result of this branch.
 	 */
-	public SwitchBranchNode(Node pattern, Node result) {
-		this.pattern = pattern;
-		this.condition = new IdentifierNode("true");
-		this.result = result;
+	public SwitchBranchNode(Location location, Node pattern, Node result) {
+		this(location, pattern, new IdentifierNode(location, "true"), result);
 	}
 	
 	/**
@@ -67,17 +69,17 @@ public class SwitchBranchNode extends Node {
 		Node pattern = Node.parse(parser);
 		if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE))) {
 			Node condition = Node.parse(parser);
-			parser.expect(
+			Location switchBranchLocation = parser.expect(
 					token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN),
 					"Expected forward-arrow after branch condition.");
 			Node result = Node.parse(parser);
-			return new SwitchBranchNode(pattern, condition, result);
+			return new SwitchBranchNode(switchBranchLocation, pattern, condition, result);
 		} else {
-			parser.expect(
+			Location switchBranchLocation = parser.expect(
 					token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN),
 					"Expected forward-arrow after branch pattern.");
 			Node result = Node.parse(parser);
-			return new SwitchBranchNode(pattern, result);
+			return new SwitchBranchNode(switchBranchLocation, pattern, result);
 		}
 	}
 }

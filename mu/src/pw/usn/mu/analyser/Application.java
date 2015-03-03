@@ -1,21 +1,25 @@
 package pw.usn.mu.analyser;
 
 import pw.usn.mu.parser.ApplicationNode;
+import pw.usn.mu.tokenizer.Location;
 
 /**
  * Represents the application of a function with an argument in a
  * mu program.
  */
-public class Application implements Expression {
+public class Application extends Expression {
 	private Expression function, argument;
 	
 	/**
 	 * Initializes a new Application with the given applied function
 	 * and argument.
+	 * @param location The original location, in a source, of the code that represents
+	 * this expression.
 	 * @param function The function that is applied.
 	 * @param argument The argument passed to the function.
 	 */
-	public Application(Expression function, Expression argument) {
+	public Application(Location location, Expression function, Expression argument) {
+		super(location);
 		this.function = function;
 		this.argument = argument;
 	}
@@ -45,7 +49,7 @@ public class Application implements Expression {
 	 * node} but with all identifiers resolved into references to values.
 	 */
 	public static Application analyse(ResolutionContext context, ApplicationNode node) {
-		return new Application(
+		return new Application(node.getLocation(),
 				Expression.analyse(context, node.getFunction()),
 				Expression.analyse(context, node.getArgument()));
 	}

@@ -2,6 +2,10 @@ package pw.usn.mu.tokenizer;
 
 import pw.usn.mu.Source;
 
+/**
+ * Represents the location of an element of a program, such as a tokenized token, a parsed
+ * AST node or an analysis object, within the original source from which it was read.
+ */
 public class Location {
 	private int row, column;
 	private Source source;
@@ -18,6 +22,16 @@ public class Location {
 		this.source = source;
 	}
 	
+
+	/**
+	 * Initializes a Location used to denote that an element of a program was generated,
+	 * and is not actually represented in source code.
+	 * @param source The source containing this location.
+	 */
+	public Location(Source source) {
+		this(source, 0, 0);
+	}
+	
 	/**
 	 * Gets the location of the token.
 	 * @return A string in the format {@code source@row:column} representing the location of the
@@ -25,7 +39,11 @@ public class Location {
 	 */
 	@Override
 	public String toString() {
-		return String.format("%s@%d:%d", source.getName(), row, column);
+		if(row == 0) {
+			return String.format("%s@generated", source.getName());
+		} else {
+			return String.format("%s@%d:%d", source.getName(), row, column);
+		}
 	}
 
 	/**

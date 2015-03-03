@@ -1,6 +1,7 @@
 package pw.usn.mu.parser;
 
 import pw.usn.mu.tokenizer.IdentifierToken;
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 import pw.usn.mu.tokenizer.Token;
 
@@ -15,11 +16,13 @@ public class BindingNode extends Node {
 	/**
 	 * Initializes a new Binding with the given name and value, and content which
 	 * can refer to the bound value by the given name.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param name The name of the newly-bound value.
 	 * @param value The value to bind.
 	 * @param content The content of the binding.
 	 */
-	public BindingNode(String name, Node value, Node content) {
+	public BindingNode(Location location, String name, Node value, Node content) {
+		super(location);
 		this.name = name;
 		this.value = value;
 		this.content = content;
@@ -81,7 +84,7 @@ public class BindingNode extends Node {
 					lookaheadParser.expect(token -> token.isSymbolToken(SymbolTokenType.SEPARATOR), "Expected semicolon to end binding.");
 					Node content = parse(lookaheadParser);
 					parser.fastForward(lookaheadParser); // bring the current parser up to the level of the look-ahead parser
-					return new BindingNode(identifier.getName(), value, content);
+					return new BindingNode(identifier.getLocation(), identifier.getName(), value, content);
 				}
 			} else {
 				/* binding target can't be qualified with module names so throw a ParserException */

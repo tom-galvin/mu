@@ -1,18 +1,22 @@
 package pw.usn.mu.analyser;
 
 import pw.usn.mu.parser.LiteralIntNode;
+import pw.usn.mu.tokenizer.Location;
 
 /**
  * Represents an integer literal in a mu program.
  */
-public class LiteralInt implements Expression {
+public class LiteralInt extends Expression {
 	private int value;
 	
 	/**
 	 * Initializes a new LiteralInt with the given value.
+	 * @param location The original location, in a source, of the code that represents
+	 * this expression.
 	 * @param value The value of this string literal.
 	 */
-	public LiteralInt(int value) {
+	public LiteralInt(Location location, int value) {
+		super(location);
 		this.value = value;
 	}
 	
@@ -32,6 +36,6 @@ public class LiteralInt implements Expression {
 	 * @return An {@link LiteralInt} representing the same literal integer as {@code node}.
 	 */
 	public static LiteralInt analyse(ResolutionContext context, LiteralIntNode node) { 
-		return new LiteralInt(node.getValue());
+		return new LiteralInt(node.getLocation(), node.getValue());
 	}
 }

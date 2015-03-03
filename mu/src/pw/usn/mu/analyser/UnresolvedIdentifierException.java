@@ -40,4 +40,9 @@ public class UnresolvedIdentifierException extends RuntimeException {
 	public IdentifierNode getIdentifier() {
 		return identifier;
 	}
+	
+	@Override
+	public String getMessage() {
+		return String.format("%s (at %s)", super.getMessage(), identifier.getLocation().toString());
+	}
 }

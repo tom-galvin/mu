@@ -2,6 +2,7 @@ package pw.usn.mu.parser;
 
 import pw.usn.mu.tokenizer.LiteralIntToken;
 import pw.usn.mu.tokenizer.LiteralIntTokenBase;
+import pw.usn.mu.tokenizer.Location;
 
 /**
  * Represents an int literal in mu source code.
@@ -13,22 +14,25 @@ public class LiteralIntNode extends Node {
 	/**
 	 * Initializes a new LiteralInt with the given value and original base,
 	 * as specified in the original source.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param value The value of the int literal.
 	 * @param originalBase The original numeric base, as specified in the
 	 * source from which the original {@link pw.usn.mu.tokenizer.LiteralIntToken
 	 * LiteralIntToken} was tokenized.
 	 */
-	public LiteralIntNode(int value, LiteralIntTokenBase originalBase) {
+	public LiteralIntNode(Location location, int value, LiteralIntTokenBase originalBase) {
+		super(location);
 		this.value = value;
 		this.originalBase = originalBase;
 	}
 	
 	/**
 	 * Initializes a new LiteralInt with the given value.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param value The value of the int literal.
 	 */
-	public LiteralIntNode(int value) {
-		this(value, LiteralIntTokenBase.DECIMAL);
+	public LiteralIntNode(Location location, int value) {
+		this(location, value, LiteralIntTokenBase.DECIMAL);
 	}
 	
 	/**
@@ -55,8 +59,8 @@ public class LiteralIntNode extends Node {
 	 * @return An int literal, as parsed from the current input.
 	 */
 	public static LiteralIntNode parse(Parser parser) {
-		parser.expect(token -> token instanceof LiteralIntToken, "Int literal expected.");
+		Location location = parser.expect(token -> token instanceof LiteralIntToken, "Int literal expected.");
 		LiteralIntToken current = (LiteralIntToken)parser.current();
-		return new LiteralIntNode(current.getValue(), current.getBase());
+		return new LiteralIntNode(location, current.getValue(), current.getBase());
 	}
 }

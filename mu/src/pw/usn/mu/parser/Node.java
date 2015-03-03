@@ -3,16 +3,32 @@ package pw.usn.mu.parser;
 import pw.usn.mu.tokenizer.IdentifierToken;
 import pw.usn.mu.tokenizer.LiteralIntToken;
 import pw.usn.mu.tokenizer.LiteralStringToken;
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.OperatorToken;
 import pw.usn.mu.tokenizer.OperatorTokenType;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
 /**
- * Represents an expression that can be evaluated. This includes such
- * things like function application, functions themselves, and identifiers,
- * but not things like modules.
+ * Represents a node of the parsed AST produced from parsing a source file.
  */
 public abstract class Node implements Parsable {
+	private Location location;
+	
+	/**
+	 * Initializes a new Node with the given location in the original parsed source file.
+	 */
+	public Node(Location location) {
+		this.location = location;
+	}
+	
+	/**
+	 * Gets the location of the AST node.
+	 * @return The location of the AST node in a parsed input source.
+	 */
+	public final Location getLocation() {
+		return location;
+	}
+	
 	/**
 	 * Parses an full expression from the given parser state.
 	 * @param parser The parser enumerator to use.
@@ -43,7 +59,13 @@ public abstract class Node implements Parsable {
 	 * given {@code operator} with the given {@code left} and {@code right} operands.
 	 */
 	private static ApplicationNode createOperationApplication(Node operator, Node left, Node right) {
-		return new ApplicationNode(new ApplicationNode(operator, left), right); 
+		return new ApplicationNode(
+				operator.getLocation(),
+				new ApplicationNode(
+						operator.getLocation(),
+						operator,
+						left),
+				right); 
 	}
 	/**
 	 * Creates an expression representing the application of an unary operator with an
@@ -54,7 +76,10 @@ public abstract class Node implements Parsable {
 	 * given {@code operator} with the given {@code operand}.
 	 */
 	private static ApplicationNode createOperationApplication(Node operator, Node operand) {
-		return new ApplicationNode(operator, operand); 
+		return new ApplicationNode(
+				operator.getLocation(),
+				operator,
+				operand); 
 	}
 	
 	/**
@@ -96,8 +121,9 @@ public abstract class Node implements Parsable {
 	private static Node parseBooleanPrecedence(Parser parser) {
 		Node left = parseEqualityPrecedence(parser);
 		while(parser.accept(token -> token.isOperatorToken(OperatorTokenType.BOOLEAN))) {
-			String operator = ((OperatorToken)parser.current()).getOperator();
-			left = createOperationApplication(new IdentifierNode(operator), left, parseEqualityPrecedence(parser));
+			OperatorToken operatorToken = (OperatorToken)parser.current();
+			String operator = operatorToken.getOperator();
+			left = createOperationApplication(new IdentifierNode(operatorToken.getLocation(), operator), left, parseEqualityPrecedence(parser));
 		}
 		return left;
 	}
@@ -110,8 +136,9 @@ public abstract class Node implements Parsable {
 	private static Node parseEqualityPrecedence(Parser parser) {
 		Node left = parseSummationPrecedence(parser);
 		while(parser.accept(token -> token.isOperatorToken(OperatorTokenType.EQUALITY))) {
-			String operator = ((OperatorToken)parser.current()).getOperator();
-			left = createOperationApplication(new IdentifierNode(operator), left, parseSummationPrecedence(parser));
+			OperatorToken operatorToken = (OperatorToken)parser.current();
+			String operator = operatorToken.getOperator();
+			left = createOperationApplication(new IdentifierNode(operatorToken.getLocation(), operator), left, parseSummationPrecedence(parser));
 		}
 		return left;
 	}
@@ -124,8 +151,9 @@ public abstract class Node implements Parsable {
 	private static Node parseSummationPrecedence(Parser parser) {
 		Node left = parseProductionPrecedence(parser);
 		while(parser.accept(token -> token.isOperatorToken(OperatorTokenType.SUM))) {
-			String operator = ((OperatorToken)parser.current()).getOperator();
-			left = createOperationApplication(new IdentifierNode(operator), left, parseProductionPrecedence(parser));
+			OperatorToken operatorToken = (OperatorToken)parser.current();
+			String operator = operatorToken.getOperator();
+			left = createOperationApplication(new IdentifierNode(operatorToken.getLocation(), operator), left, parseProductionPrecedence(parser));
 		}
 		return left;
 	}
@@ -138,8 +166,9 @@ public abstract class Node implements Parsable {
 	private static Node parseProductionPrecedence(Parser parser) {
 		Node left = parseUnaryPrecedence(parser);
 		while(parser.accept(token -> token.isOperatorToken(OperatorTokenType.PRODUCT))) {
-			String operator = ((OperatorToken)parser.current()).getOperator();
-			left = createOperationApplication(new IdentifierNode(operator), left, parseUnaryPrecedence(parser));
+			OperatorToken operatorToken = (OperatorToken)parser.current();
+			String operator = operatorToken.getOperator();
+			left = createOperationApplication(new IdentifierNode(operatorToken.getLocation(), operator), left, parseUnaryPrecedence(parser));
 		}
 		return left;
 	}
@@ -151,8 +180,9 @@ public abstract class Node implements Parsable {
 	 */
 	private static Node parseUnaryPrecedence(Parser parser) {
 		if(parser.accept(token -> token.isOperatorToken(OperatorTokenType.UNARY))) {
-			String operator = ((OperatorToken)parser.current()).getOperator();
-			return createOperationApplication(new IdentifierNode(operator), parseUnaryPrecedence(parser));
+			OperatorToken operatorToken = (OperatorToken)parser.current();
+			String operator = operatorToken.getOperator();
+			return createOperationApplication(new IdentifierNode(operatorToken.getLocation(), operator), parseUnaryPrecedence(parser));
 		} else {
 			return ApplicationNode.parse(parser);
 		}

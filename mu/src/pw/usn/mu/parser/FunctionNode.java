@@ -3,6 +3,7 @@ package pw.usn.mu.parser;
 import java.util.Stack;
 
 import pw.usn.mu.tokenizer.IdentifierToken;
+import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 import pw.usn.mu.tokenizer.Token;
 
@@ -16,10 +17,12 @@ public class FunctionNode extends Node {
 	/**
 	 * Initializes a new Function with the given argument identifier and function
 	 * body.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param argumentName The name of the function argument.
 	 * @param body The body of the function.
 	 */
-	public FunctionNode(String argumentName, Node body) {
+	public FunctionNode(Location location, String argumentName, Node body) {
+		super(location);
 		this.argumentName = argumentName;
 		this.body = body;
 	}
@@ -48,7 +51,9 @@ public class FunctionNode extends Node {
 	 */
 	public static FunctionNode parse(Parser parser) {
 		Stack<String> arguments = new Stack<String>();
-		parser.expect(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE), "Expected beginning of function.");
+		Location functionLocation = parser.expect(
+				token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE), 
+				"Expected beginning of function.");
 		if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE))) {
 			Token switchExpressionToken = parser.current(2);
 			SwitchNode switchBody = SwitchNode.parse(parser);
@@ -56,7 +61,7 @@ public class FunctionNode extends Node {
 			if(switchBodyExpression instanceof IdentifierNode) {
 				IdentifierNode argumentName = (IdentifierNode)switchBodyExpression;
 				if(argumentName.isUnqualified()) {
-					return new FunctionNode(argumentName.getName(), switchBody);
+					return new FunctionNode(functionLocation, argumentName.getName(), switchBody);
 				} else {
 					throw new ParserException("Switch function argument must not be qualified.", switchExpressionToken);
 				}
@@ -75,7 +80,7 @@ public class FunctionNode extends Node {
 		} while(parser.test(token -> token instanceof IdentifierToken));
 		parser.expect(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN), "Expected forward arrow at end of argument list.");
 		Node content = BindingNode.parse(parser);
-		FunctionNode function = new FunctionNode(arguments.pop(), content);
+		FunctionNode function = new FunctionNode(functionLocation, arguments.pop(), content);
 		return function;
 	}
 }

@@ -1,18 +1,22 @@
 package pw.usn.mu.analyser;
 
 import pw.usn.mu.parser.LiteralStringNode;
+import pw.usn.mu.tokenizer.Location;
 
 /**
  * Represents an string literal in a mu program.
  */
-public class LiteralString implements Expression {
+public class LiteralString extends Expression {
 	private String value;
 	
 	/**
 	 * Initializes a new LiteralString with the given value.
+	 * @param location The original location, in a source, of the code that represents
+	 * this expression.
 	 * @param value The value of this string literal.
 	 */
-	public LiteralString(String value) {
+	public LiteralString(Location location, String value) {
+		super(location);
 		this.value = value;
 	}
 	
@@ -33,6 +37,6 @@ public class LiteralString implements Expression {
 	 * node}.
 	 */
 	public static LiteralString analyse(ResolutionContext context, LiteralStringNode node) { 
-		return new LiteralString(node.getValue());
+		return new LiteralString(node.getLocation(), node.getValue());
 	}
 }

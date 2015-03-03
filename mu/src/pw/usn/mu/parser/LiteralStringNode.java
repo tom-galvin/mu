@@ -1,6 +1,7 @@
 package pw.usn.mu.parser;
 
 import pw.usn.mu.tokenizer.LiteralStringToken;
+import pw.usn.mu.tokenizer.Location;
 
 /**
  * Represents a string literal in mu source code.
@@ -14,9 +15,11 @@ public class LiteralStringNode extends Node {
 	
 	/**
 	 * Initializes a new LiteralString with the given value.
+	 * @param location The location of the AST node in a parsed input source.
 	 * @param value The value of the string represented by this literal.
 	 */
-	public LiteralStringNode(String value) {
+	public LiteralStringNode(Location location, String value) {
+		super(location);
 		this.value = value;
 	}
 	
@@ -34,7 +37,8 @@ public class LiteralStringNode extends Node {
 	 * @return A string literal, as parsed from the current input.
 	 */
 	public static LiteralStringNode parse(Parser parser) {
-		parser.expect(token -> token instanceof LiteralStringToken, "String literal expected.");
-		return new LiteralStringNode(((LiteralStringToken)parser.current()).getValue());
+		Location location = parser.expect(token -> token instanceof LiteralStringToken, "String literal expected.");
+		LiteralStringToken current = (LiteralStringToken)parser.current();
+		return new LiteralStringNode(location, current.getValue());
 	}
 }

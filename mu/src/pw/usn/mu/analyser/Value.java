@@ -2,6 +2,8 @@ package pw.usn.mu.analyser;
 
 import java.util.Random;
 
+import pw.usn.mu.tokenizer.Location;
+
 /**
  * Represents a value in a mu program. Note that this only represents the value
  * rather than containing the value itself.
@@ -19,10 +21,12 @@ public class Value {
 	
 	/**
 	 * Creates a reference to this value.
+	 * @param location The original location, in a source, of the code that represents
+	 * this reference.
 	 * @return A {@link Reference} which refers to this value.
 	 */
-	public Reference newReference() {
-		return new Reference(this);
+	public Reference newReference(Location location) {
+		return new Reference(location, this);
 	}
 	
 	@Override

@@ -81,6 +81,9 @@ public class FunctionNode extends Node {
 		parser.expect(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_BEGIN), "Expected forward arrow at end of argument list.");
 		Node content = BindingNode.parse(parser);
 		FunctionNode function = new FunctionNode(functionLocation, arguments.pop(), content);
+		while(!arguments.empty()) {
+			function = new FunctionNode(functionLocation, arguments.pop(), function);
+		}
 		return function;
 	}
 }

@@ -59,7 +59,7 @@ public class Binding extends Expression {
 	 * node} but with all identifiers resolved into references to values.
 	 */
 	public static Binding analyse(ResolutionContext context, BindingNode node) {
-		Value value = new Value();
+		Value value = new Value(node.getName());
 		
 		ResolutionContext bindingContext = new ResolutionContext(context) {
 			@Override

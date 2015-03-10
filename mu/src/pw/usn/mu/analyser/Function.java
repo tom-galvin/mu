@@ -5,7 +5,7 @@ import pw.usn.mu.parser.IdentifierNode;
 import pw.usn.mu.tokenizer.Location;
 
 /**
- * Represents a first-class function in a mu program.
+ * Represents a first-class function definition in a mu program.
  */
 public class Function extends Expression {
 	private Value argument;
@@ -49,7 +49,7 @@ public class Function extends Expression {
 	 * node} but with all identifiers resolved into references to values.
 	 */
 	public static Function analyse(ResolutionContext context, FunctionNode node) {
-		Value argument = new Value();
+		Value argument = new Value(node.getArgumentName());
 		
 		ResolutionContext functionContext = new ResolutionContext(context) {
 			@Override

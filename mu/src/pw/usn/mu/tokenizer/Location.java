@@ -21,7 +21,6 @@ public class Location {
 		this.column = column;
 		this.source = source;
 	}
-	
 
 	/**
 	 * Initializes a Location used to denote that an element of a program was generated,
@@ -31,6 +30,14 @@ public class Location {
 	public Location(Source source) {
 		this(source, 0, 0);
 	}
+
+	/**
+	 * Initializes a Location used to denote that an element of a program was generated,
+	 * and is not actually represented in source code.
+	 */
+	public Location() {
+		this(null);
+	}
 	
 	/**
 	 * Gets the location of the token.
@@ -39,7 +46,9 @@ public class Location {
 	 */
 	@Override
 	public String toString() {
-		if(row == 0) {
+		if(source== null) {
+			return "generated";
+		} else if(row == 0) {
 			return String.format("%s@generated", source.getName());
 		} else {
 			return String.format("%s@%d:%d", source.getName(), row, column);
@@ -48,7 +57,9 @@ public class Location {
 
 	/**
 	 * Gets the source containing the location.
-	 * @return A {@link Source} representing the source containing the location.
+	 * @return A {@link Source} representing the source containing the location, or {@code null}
+	 * if this Location represents automatically-generated code that is not related to any
+	 * source in particular.
 	 */
 	public final Source getSource() {
 		return source;

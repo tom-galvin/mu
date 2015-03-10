@@ -7,10 +7,10 @@ import pw.usn.mu.parser.IdentifierNode;
  * the value to which an identifer refers to can be resolved.
  */
 public abstract class ResolutionContext {
-	private ResolutionContext globalContext, parentContext;
+	protected ResolutionContext globalContext, parentContext;
 	
 	/**
-	 * Initializes a new Context.
+	 * Initializes a new ResolutionContext.
 	 * @param globalContext The global context containing the program.
 	 * @param parentContext The context containing this context.
 	 */
@@ -20,7 +20,7 @@ public abstract class ResolutionContext {
 	}
 	
 	/**
-	 * Initializes a new Context.
+	 * Initializes a new ResolutionContext.
 	 * @param parentContext The context containing this context.
 	 */
 	public ResolutionContext(ResolutionContext parentContext) {
@@ -28,7 +28,7 @@ public abstract class ResolutionContext {
 	}
 	
 	/**
-	 * Initialize a new Context.
+	 * Initialize a new ResolutionContext.
 	 */
 	public ResolutionContext() {
 		this(null, null);

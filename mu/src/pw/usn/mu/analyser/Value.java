@@ -1,6 +1,7 @@
 package pw.usn.mu.analyser;
 
 import java.util.Random;
+import java.util.logging.Logger;
 
 import pw.usn.mu.tokenizer.Location;
 
@@ -11,12 +12,32 @@ import pw.usn.mu.tokenizer.Location;
 public class Value {
 	private long id;
 	private static Random random = new Random();
+	private String name;
 	
+	/**
+	 * Initializes a new unique Value.
+	 * @param name The original name of the value, as written in the source code.
+	 * If this parameter has the value {@code null}, then the value is assumed to be
+	 * a generated part of the program structure, rather than parsed from source code.
+	 */
+	public Value(String name) {
+		this.name = name;
+		this.id = random.nextLong();
+	}
+
 	/**
 	 * Initializes a new unique Value.
 	 */
 	public Value() {
-		this.id = random.nextLong();
+		this(null);
+	}
+	
+	/**
+	 * Gets the original name of the value, as written in the source code.
+	 * @return The original name of this value.
+	 */
+	public String getName() {
+		return name;
 	}
 	
 	/**
@@ -40,5 +61,14 @@ public class Value {
 	@Override
 	public int hashCode() {
 		return (int)(id & -1);
+	}
+	
+	@Override
+	public String toString() {
+		if(name == null) {
+			return String.format("val_%d", id);
+		} else {
+			return String.format("%s_%d", name, id);
+		}
 	}
 }

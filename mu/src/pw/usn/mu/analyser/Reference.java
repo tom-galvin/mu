@@ -32,6 +32,14 @@ public class Reference extends Expression {
 		return value.equals(this.value);
 	}
 	
+	/**
+	 * Gets the value referred to by this {@link Reference}.
+	 * @return The value referred to by this reference.
+	 */
+	public Value getValue() {
+		return value;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		return
@@ -46,16 +54,14 @@ public class Reference extends Expression {
 	}
 	
 	/**
-	 * Analyses the given {@code node} in the given context and creates an equivalent
-	 * {@link Reference}.
+	 * Analyses the given {@code node} in the given context and creates an equivalent reference.
 	 * @param context The context in which {@code node} resides.
 	 * @param node The AST node to analyse.
-	 * @return An {@link Reference} representing the same identifier as {@code node},
-	 * resolved into a reference to a value.
+	 * @return A reference representing the same identifier as {@code node}, resolved into a
+	 * reference to a value.
 	 */
 	public static Reference analyse(ResolutionContext context, IdentifierNode node) {
 		Reference reference = context.resolve(node);
-		Logger.getLogger("analysis").info(String.format("Resolved identifier %s to %d.", node.toString(), reference.hashCode()));
 		return reference;
 	}
 }

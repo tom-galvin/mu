@@ -138,7 +138,14 @@ public class Parser {
 	 */
 	public Location expect(Predicate<Token> condition, String errorMessage) {
 		if(!accept(condition)) {
-			throw new ParserException(errorMessage, current(1));
+			Token badToken = current(1);
+			if(badToken == null) {
+				/* If the parser is at the end of the source, use the final token
+				 * before the end of the file instead.
+				 */
+				badToken = current();
+			}
+			throw new ParserException(errorMessage, badToken);
 		} else {
 			return current().getLocation();
 		}

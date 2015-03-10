@@ -120,12 +120,18 @@ public class ModuleNode extends Node {
 	 */
 	public static ModuleNode parse(Location identifierLocation, Parser parser) {
 		ModuleNode module = new ModuleNode(identifierLocation);
+		
 		while(parser.test(token -> token instanceof IdentifierToken) ||
 		      parser.test(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
 			Token identifierToken;
 			IdentifierNode identifier;
 			boolean isSymbolIdentifer;
 			
+			/*
+			 * If the identifier name of the definition in the module is parenthesized, then it
+			 * must be an operator declaration, such as:
+			 *     (++) <- (\ x y -> x * x + y * y |> sqrt )
+			 */
 			if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
 				parser.expect(token -> token instanceof OperatorToken, "Expected operator symbol in operator definition.");
 				identifierToken = parser.current();
@@ -144,6 +150,10 @@ public class ModuleNode extends Node {
 			}
 			
 			parser.expect(token -> token.isSymbolToken(SymbolTokenType.BIND), "Expected back-arrow in module definition.");
+			
+			/*
+			 * Look ahead to see if the value of the definition is a function.
+			 */
 			if(parser.test(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN)) &&
 			   parser.test(token -> token.isSymbolToken(SymbolTokenType.MODULE_DECLARE), 1)) {
 				if(isSymbolIdentifer) {

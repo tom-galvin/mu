@@ -8,6 +8,7 @@ import pw.usn.mu.Source;
  * Represents a factory for creating {@link Token}s from a tokenizer pattern
  * match result.
  */
+@FunctionalInterface
 public interface TokenFactory {
 	/**
 	 * Creates a factory-specific {@link Token} from the given pattern

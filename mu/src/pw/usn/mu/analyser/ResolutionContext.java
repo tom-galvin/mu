@@ -4,7 +4,7 @@ import pw.usn.mu.parser.IdentifierNode;
 
 /**
  * Represents a context in which values are bound to identifiers, and in which
- * the value to which an identifer refers to can be resolved.
+ * the value to which an identifer refers can be resolved.
  */
 public abstract class ResolutionContext {
 	protected ResolutionContext globalContext, parentContext;

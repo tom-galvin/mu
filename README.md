@@ -5,7 +5,7 @@ Mu is a simple functional programming language I'm working on. The compiler is c
 * The language specification itself is not concrete, and is subject to revision at any time. In fact, the specification doesn't exist - I'm making the language up as I go along.
 * The lexical analyser and parser are complete. Parser is a hand-written recursive descent parser with a weird lookahead mechanism.
 * Fully resolving identifiers in the AST is almost complete - precompiled library support is not yet implemented.
-* Turning functions into closures is yet to be done.
+* Turning functions into closures is complete but not yet tested.
 * Generating C output is yet to be done.
 * Error reporting is patchy (but it exists!), and stability isn't brilliant.
 * Everything is fairly well documented with Javadoc and normal comments - if something is not clear, submit an issue on the GitHub repository.

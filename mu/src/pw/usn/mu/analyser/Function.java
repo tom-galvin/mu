@@ -1,5 +1,10 @@
 package pw.usn.mu.analyser;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import pw.usn.mu.analyser.closure.ClosureContext;
+import pw.usn.mu.analyser.closure.FunctionClosureContext;
 import pw.usn.mu.parser.FunctionNode;
 import pw.usn.mu.parser.IdentifierNode;
 import pw.usn.mu.tokenizer.Location;
@@ -10,6 +15,7 @@ import pw.usn.mu.tokenizer.Location;
 public class Function extends Expression {
 	private Value argument;
 	private Expression body;
+	private Map<Value, Reference> closureContext;
 	
 	/**
 	 * Initializes a new Function.
@@ -22,6 +28,7 @@ public class Function extends Expression {
 		super(location);
 		this.argument = argument;
 		this.body = body;
+		this.closureContext = new HashMap<Value, Reference>();
 	}
 	
 	/**
@@ -38,6 +45,24 @@ public class Function extends Expression {
 	 */
 	public Expression getBody() {
 		return body;
+	}
+	
+	/**
+	 * Gets the closure context for this function. This maps local
+	 * closure values into references to values outside of this function.
+	 * @return The closure context for this function.
+	 */
+	public Map<Value, Reference> getClosureContext() {
+		return closureContext;
+	}
+	
+	@Override
+	public void liftClosures(ClosureContext context) {
+		FunctionClosureContext functionContext = new FunctionClosureContext(this, context);
+		body.liftClosures(functionContext);
+		functionContext.getLocalClosure().forEach((v, l) -> {
+			closureContext.put(v, l.newReference(getLocation()));
+		});
 	}
 
 	/**

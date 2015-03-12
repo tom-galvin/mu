@@ -1,7 +1,8 @@
 package pw.usn.mu.analyser;
 
-import java.util.logging.Logger;
-
+import pw.usn.mu.analyser.builtin.Builtin;
+import pw.usn.mu.analyser.closure.ClosureContext;
+import pw.usn.mu.analyser.module.ModuleValue;
 import pw.usn.mu.parser.IdentifierNode;
 import pw.usn.mu.tokenizer.Location;
 
@@ -19,7 +20,7 @@ public class Reference extends Expression {
 	 */
 	public Reference(Location location, Value value) {
 		super(location);
-		this.value = value;
+		redirect(value);
 	}
 	
 	/**
@@ -41,6 +42,11 @@ public class Reference extends Expression {
 	}
 	
 	@Override
+	public void liftClosures(ClosureContext context) {
+		context.liftReference(this);
+	}
+	
+	@Override
 	public boolean equals(Object obj) {
 		return
 				obj != null &&
@@ -51,6 +57,33 @@ public class Reference extends Expression {
 	@Override
 	public int hashCode() {
 		return value.hashCode();
+	}
+	
+	/**
+	 * Redirects this {@link Reference} to refer to the given value. Calling
+	 * this method will remove the link between this reference and the value
+	 * referred to previously (if it exists) and create a link between this
+	 * reference and the newly referred-to value.
+	 * @param value The value to refer to.
+	 */
+	public void redirect(Value value) {
+		if(this.value != null) {
+			this.value.removeReference(this);
+		}
+		this.value = value;
+		this.value.addReference(this);
+	}
+	
+	/**
+	 * Determines whether this reference refers to a value that cannot be a
+	 * local reference, such as a value defined in a module or a built-in
+	 * function.
+	 * @return Whether this reference is non-local or not.
+	 */
+	public boolean isNonLocalReference() {
+		return
+				value instanceof ModuleValue ||
+				value instanceof Builtin;
 	}
 	
 	/**

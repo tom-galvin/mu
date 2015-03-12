@@ -1,5 +1,6 @@
 package pw.usn.mu.analyser;
 
+import pw.usn.mu.analyser.closure.ClosureContext;
 import pw.usn.mu.parser.ApplicationNode;
 import pw.usn.mu.tokenizer.Location;
 
@@ -38,6 +39,12 @@ public class Application extends Expression {
 	 */
 	public Expression getArgument() {
 		return argument;
+	}
+	
+	@Override
+	public void liftClosures(ClosureContext context) {
+		function.liftClosures(context);
+		argument.liftClosures(context);
 	}
 	
 	/**

@@ -11,7 +11,7 @@ import pw.usn.mu.parser.ModuleNode;
 import pw.usn.mu.tokenizer.Location;
 
 /**
- * An object which accepts one or more top-level {@link  ModuleNode}s 
+ * An object which accepts one or more top-level {@link ModuleNode}s 
  * from source files, performs semantic analysis, and returns a
  * {@link Module} containing the root module of all the defined
  * submodules in a mu program.
@@ -22,15 +22,20 @@ public class DefaultAnalyser implements Analyser {
 	public Module analyse(ModuleNode... nodes) {
 		Module rootModule = new Module(new Location());
 		Queue<Consumer<ResolutionContext>> handlers = new ArrayDeque<Consumer<ResolutionContext>>();
+		Consumer<Expression> analyser = e -> e.liftClosures();
+		
 		for(ModuleNode node : nodes) {
-			Module analysedModule = Module.analyseInitial(handlers, node);
+			Module analysedModule = Module.analyseInitial(handlers, analyser, node);
 			rootModule.absorbModule(analysedModule);
 		}
+		
 		ModuleResolutionContext moduleResolutionContext = new ModuleResolutionContext(rootModule);
 		BuiltinResolutionContext builtinResolutionContext = new BuiltinResolutionContext(moduleResolutionContext);
+		
 		for(Consumer<ResolutionContext> handler : handlers) {
 			handler.accept(builtinResolutionContext);
 		}
+		
 		return rootModule;
 	}
 }

@@ -1,5 +1,6 @@
 package pw.usn.mu.analyser;
 
+import pw.usn.mu.analyser.closure.ClosureContext;
 import pw.usn.mu.parser.ApplicationNode;
 import pw.usn.mu.parser.BindingNode;
 import pw.usn.mu.parser.FunctionNode;
@@ -28,6 +29,21 @@ public abstract class Expression {
 	 */
 	public final Location getLocation() {
 		return location;
+	}
+	
+	/**
+	 * Lifts all free variables in this expression up to the local scope.
+	 * @param context The closure-lifting context to use for determining the correct
+	 * values to lift.
+	 */
+	public abstract void liftClosures(ClosureContext context);
+	
+	/**
+	 * Lifts all free variables in this expression up to the local scope. This makes
+	 * {@code this} the top-level context during closure lifting.
+	 */
+	public void liftClosures() {
+		liftClosures(null);
 	}
 	
 	/**

@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.function.Consumer;
 
-
 import pw.usn.mu.analyser.AnalysisErrorException;
 import pw.usn.mu.analyser.Expression;
 import pw.usn.mu.analyser.ResolutionContext;
+import pw.usn.mu.analyser.closure.ClosureContext;
 import pw.usn.mu.parser.ModuleNode;
 import pw.usn.mu.tokenizer.Location;
 
@@ -211,6 +211,11 @@ public class Module extends Expression {
 		return value;
 	}
 	
+	@Override
+	public void liftClosures(ClosureContext context) {
+		throw new IllegalStateException("Cannot lift closures at the Module level.");
+	}
+	
 	/**
 	 * Perform the initial {@link Module} analysis step. We declare the definitions in
 	 * modules, and then analyse and add their definitions, in two separate passes.
@@ -219,11 +224,13 @@ public class Module extends Expression {
 	 * @param handlers A queue of handlers which must be executed in order to resolve
 	 * the definitions in this module and add them to the returned {@link Module} object
 	 * after initial analysis.
+	 * @param analyser The consumer which performs analyser-specific transformations on
+	 * each definition in a module.
 	 * @param node The node of the module to analyse.
 	 * @return A {@link Module} containing the structure of this module and submodules,
 	 * but lacking definitions of declared values.
 	 */
-	public static Module analyseInitial(Queue<Consumer<ResolutionContext>> handlers, ModuleNode node) {
+	public static Module analyseInitial(Queue<Consumer<ResolutionContext>> handlers, Consumer<Expression> analyser, ModuleNode node) {
 		Module module = new Module(node.getLocation());
 		
 		String[] submodules = node.getSubmodules();
@@ -231,18 +238,25 @@ public class Module extends Expression {
 			module.addSubmodule(
 					submodule,
 					analyseInitial(
-							handlers,
+							handlers, analyser,
 							node.getSubmodule(submodule)));
 		}
 		
 		String[] declarations = node.getDefinitions();
 		for(String declarationName : declarations) {
 			ModuleValue value = module.addDeclaration(declarationName);
-			handlers.add(context -> module.addDefinition(
-					value,
-					Expression.analyse(
-							context,
-							node.getDefinition(declarationName))));
+			handlers.add(context -> {
+				// Analyse the expression...
+				Expression expression = Expression.analyse(
+						context,
+						node.getDefinition(declarationName));
+				
+				// Do whatever the analyser wants us to do to each expression...
+				analyser.accept(expression);
+				
+				// Now add the transformed expression to the module.
+				module.addDefinition(value, expression);
+			});
 		}
 		return module;
 	}

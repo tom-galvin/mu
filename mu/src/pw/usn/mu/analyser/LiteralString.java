@@ -1,5 +1,6 @@
 package pw.usn.mu.analyser;
 
+import pw.usn.mu.analyser.closure.ClosureContext;
 import pw.usn.mu.parser.LiteralStringNode;
 import pw.usn.mu.tokenizer.Location;
 
@@ -26,6 +27,11 @@ public class LiteralString extends Expression {
 	 */
 	public String getValue() {
 		return value;
+	}
+	
+	@Override
+	public void liftClosures(ClosureContext context) {
+		/* Nothing to do! */
 	}
 
 	/**

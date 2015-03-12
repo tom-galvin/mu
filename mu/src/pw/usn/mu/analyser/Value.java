@@ -1,7 +1,6 @@
 package pw.usn.mu.analyser;
 
 import java.util.Random;
-import java.util.logging.Logger;
 
 import pw.usn.mu.tokenizer.Location;
 
@@ -47,7 +46,27 @@ public class Value {
 	 * @return A {@link Reference} which refers to this value.
 	 */
 	public Reference newReference(Location location) {
-		return new Reference(location, this);
+		Reference reference = new Reference(location, this);
+		addReference(reference);
+		return reference;
+	}
+	
+	/**
+	 * Adds and tracks a reference to this {@link Value}.
+	 * @param reference The reference to track.
+	 */
+	protected void addReference(Reference reference) {
+		/* No need for this yet. */
+	}
+	
+	/**
+	 * Removes a reference added by {@link Value#addReference(Reference) addReference(Reference)}.
+	 * This means that this {@link Value} will no longer track {@code reference} as a
+	 * reference to itself.
+	 * @param reference The reference to drop.
+	 */
+	protected void removeReference(Reference reference) {
+		/* No need for this yet. */
 	}
 	
 	@Override

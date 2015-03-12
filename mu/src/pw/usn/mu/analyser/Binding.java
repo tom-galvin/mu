@@ -1,8 +1,11 @@
 package pw.usn.mu.analyser;
 
+import java.util.HashMap;
 import java.util.stream.Stream;
 
+import pw.usn.mu.analyser.closure.BindingClosureContext;
 import pw.usn.mu.analyser.closure.ClosureContext;
+import pw.usn.mu.analyser.closure.FunctionClosureContext;
 import pw.usn.mu.parser.BindingNode;
 import pw.usn.mu.parser.IdentifierNode;
 import pw.usn.mu.tokenizer.Location;
@@ -55,30 +58,7 @@ public class Binding extends Expression {
 	
 	@Override
 	public void liftClosures(ClosureContext context) {
-		ClosureContext bindingContext = new ClosureContext(context) {
-			@Override
-			public void liftReference(Reference reference) {
-				if(reference.isNonLocalReference()) {
-					/* Do nothing - the reference refers to a value that is not
-					 * declared in a local scope, so we cannot close over it.
-					 */
-				} if(reference.refersTo(getValue())) {
-					/* Do nothing - we know this reference refers to a value
-					 * in local scope (ie. a value bound in this binding),
-					 * so we don't need to do anything else.
-					 */
-				} else {
-					getEnclosingScope().liftReference(reference);
-				}
-			}
-			
-			@Override
-			public Stream<Value> getLocalValues() {
-				return Stream.concat(
-						Stream.of(getValue()),
-						getEnclosingScope().getLocalValues());
-			}
-		};
+		ClosureContext bindingContext = new BindingClosureContext(this, context);
 		expression.liftClosures(bindingContext);
 		body.liftClosures(bindingContext);
 	}

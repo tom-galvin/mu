@@ -19,11 +19,7 @@ public class SequenceNode extends Node {
 	 */
 	public SequenceNode(Location location, Node... values) {
 		super(location);
-		if(values.length > 1) {
-			this.values = values;
-		} else {
-			throw new IllegalArgumentException("Sequence must have at least two values.");
-		}
+		this.values = values;
 	}
 	
 	/**

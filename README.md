@@ -25,15 +25,15 @@ Custom operators are also supported:
 
     (|>) <- (\ a b -> b a);
 
-Currently, user defined operators are all left-associative and the precedence is determined by the first character of the expression. Obvious inspiration is drawn from Haskell and F#, and (to a lesser extent) LISP. The reason for the total lack of language keywords is part brevity and part to write obfuscated code (heh). The language is simple enough, there are only a few defined constructs.
+Currently, user defined operators are all left-associative and the precedence is determined by the first character of the expression. Obvious inspiration is drawn from Haskell and F#, and (to a lesser extent) Lisp. The reason for the total lack of language keywords is part brevity and part to write obfuscated code (heh). The language is simple enough, there are only a few defined constructs.
 
 * **Function**, such as `(\ x -> x + 1)`, or `(\ x y -> x * x + y * y |> sqrt)`
 * **Binding**, such as `myNumber <- x + 1;` or `vectorLength <- (\ x y -> x * x + y * y |> sqrt)`
 * **Pattern-matching**, as in the fibonacci example above - it's the block delimited by `(?` and `)`.
 * **Function application**, obviously.
 * **Modules**, which is essentially a bunch of bindings delimited by `(@` and `)` which can be nested to form namespaces.
-* **Literals**, ie. strings and integers. No floating point support yet, because I'm lazy.
-* **Sequences**, which is like a `list` in F# - `[3, 2, -1, 92]`; you know the drill.
+* **Literals**, ie. strings and integers. There's also the symbol, as in Lisp or Ruby - tokens looks like `'this`, `'123` or `'"A longer token!"`. No floating point support yet, because I'm lazy.
+* **Sequences**, which is like a `list` in F# - `[3, 2, -1, 92]`; you know the drill. Features a cons operator `::` that works as you'd expect.
 * **Tuples**, with items separated by commas. Compiler supports tagged tuples (ie. to form a rudimentary tagged-union system) but I've not decided how to implement this in the language yet.
 
 That's it. Record structures might come soon, as curly-braces aren't used yet. Some things have incomplete support for now, as I attempt to get the language off the ground. For example, pattern-match expressions aren't yet implemented in the compiler. They're coming soon, though, so don't worry!

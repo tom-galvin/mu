@@ -54,9 +54,13 @@ public enum SymbolTokenType {
 	 */
 	FUNCTION_BEGIN("->"),
 	/**
-	 * Represents the cons operator ({@code :}).
+	 * Represents the cons operator ({@code ::}).
 	 */
-	CONS(":"),
+	CONS("::"),
+	/**
+	 * Represents the colon symbol ({@code :}).
+	 */
+	COLON(":"),
 	/**
 	 * Represents the start of a switch block ({@code ?}).
 	 */

@@ -7,6 +7,7 @@ import pw.usn.mu.parser.FunctionNode;
 import pw.usn.mu.parser.IdentifierNode;
 import pw.usn.mu.parser.LiteralIntNode;
 import pw.usn.mu.parser.LiteralStringNode;
+import pw.usn.mu.parser.LiteralSymbolNode;
 import pw.usn.mu.parser.Node;
 import pw.usn.mu.parser.SequenceNode;
 import pw.usn.mu.parser.TupleNode;
@@ -80,6 +81,8 @@ public abstract class Expression {
 			return LiteralInt.analyse(context, (LiteralIntNode)node);
 		} else if(node instanceof LiteralStringNode) {
 			return LiteralString.analyse(context, (LiteralStringNode)node);
+		} else if(node instanceof LiteralSymbolNode) {
+			return LiteralSymbol.analyse(context, (LiteralSymbolNode)node);
 		} else if(node instanceof IdentifierNode) {
 			return Reference.analyse(context, (IdentifierNode)node);
 		} else if(node instanceof TupleNode) {

@@ -1,5 +1,7 @@
 package pw.usn.mu.tokenizer;
 
+import java.util.regex.Pattern;
+
 /**
  * A factory for creating mu language tokenizers.
  */
@@ -45,6 +47,7 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.MODULE_DECLARE));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.FUNCTION_BEGIN));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.CONS));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.COLON));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.SWITCH_DECLARE));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.SEPARATOR));
 	}
@@ -84,5 +87,13 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 						loc,
 						LiteralIntTokenBase.DECIMAL.fromString(res.group()),
 						LiteralIntTokenBase.DECIMAL)));
+		
+		for(Pattern symbolPattern : LiteralSymbolToken.getLiteralSymbolPatterns()) {
+			tokenizer.addRule(new SimpleTokenizerRule(
+					symbolPattern,
+					(loc, res) -> new LiteralSymbolToken(
+							loc,
+							res.group(1))));
+		}
 	}
 }

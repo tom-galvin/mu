@@ -1,8 +1,11 @@
 package pw.usn.mu.parser;
 
+import java.util.Stack;
+
 import pw.usn.mu.tokenizer.IdentifierToken;
 import pw.usn.mu.tokenizer.LiteralIntToken;
 import pw.usn.mu.tokenizer.LiteralStringToken;
+import pw.usn.mu.tokenizer.LiteralSymbolToken;
 import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.OperatorToken;
 import pw.usn.mu.tokenizer.OperatorTokenType;
@@ -13,6 +16,7 @@ import pw.usn.mu.tokenizer.SymbolTokenType;
  */
 public abstract class Node implements Parsable {
 	private Location location;
+	public static final String CONS_BUILTIN ="__cons";
 	
 	/**
 	 * Initializes a new Node with the given location in the original parsed source file.
@@ -46,7 +50,7 @@ public abstract class Node implements Parsable {
 	 * @return An expression, as parsed from the current input.
 	 */
 	public static Node parseBound(Parser parser) {
-		return parseBooleanPrecedence(parser);
+		return parseCons(parser);
 	}
 	
 	/**
@@ -93,6 +97,8 @@ public abstract class Node implements Parsable {
 			return LiteralStringNode.parse(parser);
 		} else if(parser.test(token -> token instanceof LiteralIntToken)) {
 			return LiteralIntNode.parse(parser);
+		} else if(parser.test(token -> token instanceof LiteralSymbolToken)) {
+			return LiteralSymbolNode.parse(parser);
 		} else if(parser.test(token -> token instanceof IdentifierToken)) {
 			return IdentifierNode.parse(parser);
 		} else if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_OPEN))) {
@@ -115,6 +121,37 @@ public abstract class Node implements Parsable {
 		} else {
 			throw new ParserException("Unexpected token in expression.", parser.current(1));
 		}
+	}
+	
+	/**
+	 * Parses an expression at the precedence of the right-associative cons ({@code ::}) operator.
+	 * @param parser The parser enumerator to use.
+	 * @return An expression, as parsed from the current input.
+	 */
+	private static Node parseCons(Parser parser) {
+		/* This uses a stack to parse the cons operator due to its right associativity.
+		 * The location stack stores the location of the :: symbols themselves and will
+		 * always have exactly one less item than the node stack. 
+		 */
+		Stack<Node> nodes = new Stack<Node>();
+		Stack<Location> locations = new Stack<Location>();
+		
+		do {
+			if(!nodes.isEmpty()) {
+				/* If this isn't the first node, then we've just accepted a :: symbol, so
+				 * push the location of the current token under the parser enumerator,
+				 * which will be the :: symbol that's just been accepted in the while clause.
+				 */
+				locations.add(parser.current().getLocation());
+			}
+			nodes.add(parseBooleanPrecedence(parser));
+		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.CONS)));
+		
+		Node expr = nodes.pop();
+		while(!nodes.isEmpty()) {
+			expr = createOperationApplication(new IdentifierNode(locations.pop(), CONS_BUILTIN), nodes.pop(), expr);
+		}
+		return expr;
 	}
 	
 	/**

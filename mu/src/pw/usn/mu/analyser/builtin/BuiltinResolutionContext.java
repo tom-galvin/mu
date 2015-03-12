@@ -53,6 +53,7 @@ public class BuiltinResolutionContext extends ResolutionContext {
 	 */
 	protected void registerBuiltins() {
 		registerBuiltin(new Builtin("__add", 2));
+		registerBuiltin(new Builtin("__cons", 2));
 	}
 	
 	@Override

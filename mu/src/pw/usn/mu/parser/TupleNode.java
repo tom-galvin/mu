@@ -19,18 +19,21 @@ public class TupleNode extends Node {
 	 */
 	public TupleNode(Location location, Node... values) {
 		super(location);
-		if(values.length > 1) {
+		if(values.length != 1) {
 			this.values = values;
 		} else {
-			throw new IllegalArgumentException("Tuple must have at least two values.");
+			throw new IllegalArgumentException(
+					  "Tuple may not have only one value. "
+					+ "Tuples with zero values are allowed as unit values, and tuples "
+					+ "with two values or more are allowed as tuples.");
 		}
 	}
 	
 	/**
-	 * Gets the length of the tuple.
-	 * @return The length (number of values) in this tuple.
+	 * Gets the size of the tuple.
+	 * @return The size (number of values) in this tuple.
 	 */
-	public int getLength() {
+	public int getSize() {
 		return values.length;
 	}
 	
@@ -40,7 +43,7 @@ public class TupleNode extends Node {
 	 * @param index The position in the tuple of the value to get.
 	 * @return The specified value in the suple.
 	 */
-	public Node getValues(int index) {
+	public Node getValue(int index) {
 		return values[index];
 	}
 	

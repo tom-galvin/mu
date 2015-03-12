@@ -36,4 +36,4 @@ Currently, user defined operators are all left-associative and the precedence is
 * **Sequences**, which is like a `list` in F# - `[3, 2, -1, 92]`; you know the drill.
 * **Tuples**, with items separated by commas. Compiler supports tagged tuples (ie. to form a rudimentary tagged-union system) but I've not decided how to implement this in the language yet.
 
-That's it. Record structures might come soon, as curly-braces aren't used yet. Some things have incomplete support for now, as I attempt to get the language off the ground. For example, pattern-matching, sequences and tuples aren't yet implemented in the compiler. They're coming soon, though, so don't worry!
+That's it. Record structures might come soon, as curly-braces aren't used yet. Some things have incomplete support for now, as I attempt to get the language off the ground. For example, pattern-match expressions aren't yet implemented in the compiler. They're coming soon, though, so don't worry!

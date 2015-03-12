@@ -40,7 +40,7 @@ public class SequenceNode extends Node {
 	 * @param index The position in the sequence of the value to get.
 	 * @return The specified value in the suple.
 	 */
-	public Node getValues(int index) {
+	public Node getValue(int index) {
 		return values[index];
 	}
 	

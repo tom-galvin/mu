@@ -98,16 +98,20 @@ public abstract class Node implements Parsable {
 		} else if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_OPEN))) {
 			return SequenceNode.parse(parser);
 		} else if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
-			Node expression;
-			if(parser.test(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE))) {
-				expression = FunctionNode.parse(parser);
-			} else if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE))) {
-				expression = SwitchNode.parse(parser);
+			if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE))) {
+				return new TupleNode(parser.current().getLocation());
 			} else {
-				expression = Node.parse(parser);
+				Node expression;
+				if(parser.test(token -> token.isSymbolToken(SymbolTokenType.FUNCTION_DECLARE))) {
+					expression = FunctionNode.parse(parser);
+				} else if(parser.test(token -> token.isSymbolToken(SymbolTokenType.SWITCH_DECLARE))) {
+					expression = SwitchNode.parse(parser);
+				} else {
+					expression = Node.parse(parser);
+				}
+				parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Closing parenthesis expected.");
+				return expression;
 			}
-			parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Closing parenthesis expected.");
-			return expression;
 		} else {
 			throw new ParserException("Unexpected token in expression.", parser.current(1));
 		}

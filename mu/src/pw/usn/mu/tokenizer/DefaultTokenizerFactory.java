@@ -37,6 +37,8 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.BIND));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.PAREN_OPEN));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.PAREN_CLOSE));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.SEQUENCE_OPEN));
+		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.SEQUENCE_CLOSE));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.NAMESPACE_QUALIFIER));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.COMMA));
 		tokenizer.addRule(new SymbolTokenizerRule(SymbolTokenType.FUNCTION_DECLARE));

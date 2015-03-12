@@ -8,6 +8,8 @@ import pw.usn.mu.parser.IdentifierNode;
 import pw.usn.mu.parser.LiteralIntNode;
 import pw.usn.mu.parser.LiteralStringNode;
 import pw.usn.mu.parser.Node;
+import pw.usn.mu.parser.SequenceNode;
+import pw.usn.mu.parser.TupleNode;
 import pw.usn.mu.tokenizer.Location;
 
 /**
@@ -80,6 +82,10 @@ public abstract class Expression {
 			return LiteralString.analyse(context, (LiteralStringNode)node);
 		} else if(node instanceof IdentifierNode) {
 			return Reference.analyse(context, (IdentifierNode)node);
+		} else if(node instanceof TupleNode) {
+			return Tuple.analyse(context, (TupleNode)node);
+		} else if(node instanceof SequenceNode) {
+			return Sequence.analyse(context, (SequenceNode)node);
 		} else {
 			throw new RuntimeException("Unknown AST node type: " + node.getClass().getSimpleName());
 		}

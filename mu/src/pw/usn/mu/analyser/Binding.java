@@ -1,9 +1,14 @@
 package pw.usn.mu.analyser;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
 import pw.usn.mu.analyser.closure.BindingClosureContext;
 import pw.usn.mu.analyser.closure.ClosureContext;
 import pw.usn.mu.parser.BindingNode;
 import pw.usn.mu.parser.IdentifierNode;
+import pw.usn.mu.parser.Node;
+import pw.usn.mu.parser.binding.BindConsNode;
 import pw.usn.mu.tokenizer.Location;
 
 /**
@@ -69,6 +74,15 @@ public class Binding extends Expression {
 	 */
 	public static Binding analyse(ResolutionContext context, BindingNode node) {
 		Value value = new Value(node.getName());
+		Queue<Node> structureQueue = new ArrayDeque<Node>();
+		structureQueue.add(node.getBindingStructure());
+		while(!structureQueue.isEmpty()) {
+			Node structureNode = structureQueue.remove();
+			if(structureNode instanceof BindConsNode) {
+				BindConsNode consNode = (BindConsNode)structureNode;
+				consNode.
+			}
+		}
 		
 		ResolutionContext bindingContext = new ResolutionContext(context) {
 			@Override

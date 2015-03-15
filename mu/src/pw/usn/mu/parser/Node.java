@@ -2,6 +2,8 @@ package pw.usn.mu.parser;
 
 import java.util.Stack;
 
+import pw.usn.mu.parser.binding.BindTupleNode;
+import pw.usn.mu.parser.binding.BindValueNode;
 import pw.usn.mu.tokenizer.IdentifierToken;
 import pw.usn.mu.tokenizer.LiteralIntToken;
 import pw.usn.mu.tokenizer.LiteralStringToken;
@@ -36,20 +38,20 @@ public abstract class Node implements Parsable {
 	/**
 	 * Parses an full expression from the given parser state.
 	 * @param parser The parser enumerator to use.
-	 * @return An expression, as parsed from the current input.
+	 * @return An AST node, as parsed from the current input.
 	 */
 	public static Node parse(Parser parser) {
 		return TupleNode.parse(parser);
 	}
 	
 	/**
-	 * Parses a bound expression from the given parser state. This allows infix operators in
+	 * Parses a tightly-bound expression from the given parser state. This allows infix operators in
 	 * the parsed expression and should be use when the expression to be parsed is delimited.
 	 * This does not, however, permit unparenthesized tuples.
 	 * @param parser The parser enumerator to use.
-	 * @return An expression, as parsed from the current input.
+	 * @return An AST node, as parsed from the current input.
 	 */
-	public static Node parseBound(Parser parser) {
+	public static Node parseTight(Parser parser) {
 		return parseCons(parser);
 	}
 	
@@ -87,10 +89,28 @@ public abstract class Node implements Parsable {
 	}
 	
 	/**
+	 * Parses a binding structure node. These types of nodes are all in the package
+	 * {@link pw.usn.mu.parser.binding}.
+	 * @param parser The parser enumerator to use.
+	 * @return A binding structure node, as parsed from the current input.
+	 */
+	public static Node parseBindNode(Parser parser) {
+		if(parser.test(token -> token instanceof IdentifierToken)) {
+			return BindValueNode.parse(parser);
+		} else if(parser.accept(token -> token.isSymbolToken(SymbolTokenType.PAREN_OPEN))) {
+			Node bindNode = BindTupleNode.parse(parser);
+			parser.expect(token -> token.isSymbolToken(SymbolTokenType.PAREN_CLOSE), "Closing parenthesis expected.");
+			return bindNode;
+		} else {
+			throw new ParserException("Unexpected token in expression.", parser.current(1));
+		}
+	}
+	
+	/**
 	 * Parses an atomic expression - that is, one such as a literal expression,
 	 * an identifier, a bracketed expression or a function.
 	 * @param parser The parser enumerator to use.
-	 * @return An expression, as parsed from the current input.
+	 * @return An AST node, as parsed from the current input.
 	 */
 	public static Node parseAtomic(Parser parser) {
 		if(parser.test(token -> token instanceof LiteralStringToken)) {
@@ -126,7 +146,7 @@ public abstract class Node implements Parsable {
 	/**
 	 * Parses an expression at the precedence of the right-associative cons ({@code ::}) operator.
 	 * @param parser The parser enumerator to use.
-	 * @return An expression, as parsed from the current input.
+	 * @return An AST node, as parsed from the current input.
 	 */
 	private static Node parseCons(Parser parser) {
 		/* This uses a stack to parse the cons operator due to its right associativity.
@@ -135,17 +155,12 @@ public abstract class Node implements Parsable {
 		 */
 		Stack<Node> nodes = new Stack<Node>();
 		Stack<Location> locations = new Stack<Location>();
-		
-		do {
-			if(!nodes.isEmpty()) {
-				/* If this isn't the first node, then we've just accepted a :: symbol, so
-				 * push the location of the current token under the parser enumerator,
-				 * which will be the :: symbol that's just been accepted in the while clause.
-				 */
-				locations.add(parser.current().getLocation());
-			}
+
+		nodes.add(parseBooleanPrecedence(parser));
+		while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.CONS))) {
+			locations.add(parser.current().getLocation());
 			nodes.add(parseBooleanPrecedence(parser));
-		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.CONS)));
+		}
 		
 		Node expr = nodes.pop();
 		while(!nodes.isEmpty()) {
@@ -157,7 +172,7 @@ public abstract class Node implements Parsable {
 	/**
 	 * Parses an expression at the precedence of the boolean operators.
 	 * @param parser The parser enumerator to use.
-	 * @return An expression, as parsed from the current input.
+	 * @return An AST node, as parsed from the current input.
 	 */
 	private static Node parseBooleanPrecedence(Parser parser) {
 		Node left = parseEqualityPrecedence(parser);
@@ -172,7 +187,7 @@ public abstract class Node implements Parsable {
 	/**
 	 * Parses an expression at the precedence of the (in)equality operators.
 	 * @param parser The parser enumerator to use.
-	 * @return An expression, as parsed from the current input.
+	 * @return An AST node, as parsed from the current input.
 	 */
 	private static Node parseEqualityPrecedence(Parser parser) {
 		Node left = parseSummationPrecedence(parser);
@@ -187,7 +202,7 @@ public abstract class Node implements Parsable {
 	/**
 	 * Parses an expression at the precedence of the summation operators.
 	 * @param parser The parser enumerator to use.
-	 * @return An expression, as parsed from the current input.
+	 * @return An AST node, as parsed from the current input.
 	 */
 	private static Node parseSummationPrecedence(Parser parser) {
 		Node left = parseProductionPrecedence(parser);
@@ -202,7 +217,7 @@ public abstract class Node implements Parsable {
 	/**
 	 * Parses an expression at the precedence of the production operators.
 	 * @param parser The parser enumerator to use.
-	 * @return An expression, as parsed from the current input.
+	 * @return An AST node, as parsed from the current input.
 	 */
 	private static Node parseProductionPrecedence(Parser parser) {
 		Node left = parseUnaryPrecedence(parser);
@@ -217,7 +232,7 @@ public abstract class Node implements Parsable {
 	/**
 	 * Parses an expression at the precedence of the production operators.
 	 * @param parser The parser enumerator to use.
-	 * @return An expression, as parsed from the current input.
+	 * @return An AST node, as parsed from the current input.
 	 */
 	private static Node parseUnaryPrecedence(Parser parser) {
 		if(parser.accept(token -> token.isOperatorToken(OperatorTokenType.UNARY))) {

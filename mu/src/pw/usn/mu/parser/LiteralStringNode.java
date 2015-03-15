@@ -14,7 +14,7 @@ public class LiteralStringNode extends Node {
 	private String value;
 	
 	/**
-	 * Initializes a new LiteralString with the given value.
+	 * Initializes a new LiteralStringNode with the given value.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param value The value of the string represented by this literal.
 	 */

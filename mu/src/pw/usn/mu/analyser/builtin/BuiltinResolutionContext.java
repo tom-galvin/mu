@@ -3,7 +3,7 @@ package pw.usn.mu.analyser.builtin;
 import java.util.HashMap;
 import java.util.Map;
 
-import pw.usn.mu.analyser.Reference;
+import pw.usn.mu.analyser.Expression;
 import pw.usn.mu.analyser.ResolutionContext;
 import pw.usn.mu.parser.IdentifierNode;
 
@@ -57,7 +57,7 @@ public class BuiltinResolutionContext extends ResolutionContext {
 	}
 	
 	@Override
-	public Reference resolve(IdentifierNode identifier) {
+	public Expression resolve(IdentifierNode identifier) {
 		if(identifier.isUnqualified()) {
 			String name = identifier.getName();
 			if(builtins.containsKey(name)) {

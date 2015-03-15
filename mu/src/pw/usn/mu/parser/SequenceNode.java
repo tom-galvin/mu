@@ -13,7 +13,7 @@ public class SequenceNode extends Node {
 	private Node[] values;
 	
 	/**
-	 * Initializes a new Sequence with the given {@code values}.
+	 * Initializes a new SequenceNode with the given {@code values}.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param values The values contained within this sequence.
 	 */
@@ -52,7 +52,7 @@ public class SequenceNode extends Node {
 		} else {
 			List<Node> expressions = new ArrayList<Node>();
 			do {
-				expressions.add(Node.parseBound(parser));
+				expressions.add(Node.parseTight(parser));
 			} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.COMMA)));
 			parser.expect(token -> token.isSymbolToken(SymbolTokenType.SEQUENCE_CLOSE), "Expected end of sequence.");
 			Node[] expressionsArray = new Node[expressions.size()];

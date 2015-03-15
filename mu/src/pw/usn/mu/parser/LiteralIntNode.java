@@ -12,7 +12,7 @@ public class LiteralIntNode extends Node {
 	private LiteralIntTokenBase originalBase;
 	
 	/**
-	 * Initializes a new LiteralInt with the given value and original base,
+	 * Initializes a new LiteralIntNode with the given value and original base,
 	 * as specified in the original source.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param value The value of the int literal.
@@ -27,7 +27,7 @@ public class LiteralIntNode extends Node {
 	}
 	
 	/**
-	 * Initializes a new LiteralInt with the given value.
+	 * Initializes a new LiteralIntNode with the given value.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param value The value of the int literal.
 	 */

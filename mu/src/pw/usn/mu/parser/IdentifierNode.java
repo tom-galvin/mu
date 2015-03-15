@@ -27,7 +27,7 @@ public class IdentifierNode extends Node {
 	}
 	
 	/**
-	 * Initializes a new Identifier with the specified identifier components.
+	 * Initializes a new IdentifierNode with the specified identifier components.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param names The components (normally separated by {@link
 	 * IdentifierNode#QUALIFIER_SYMBOL}) comprising this identifier.
@@ -44,7 +44,7 @@ public class IdentifierNode extends Node {
 	}
 	
 	/**
-	 * Initializes a new Identifier with the specified identifier string.
+	 * Initializes a new IdentifierNode with the specified identifier string.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param identifier The identifier string, as it appears in the source
 	 * code, representing this identifier.

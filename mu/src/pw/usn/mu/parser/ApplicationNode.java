@@ -10,8 +10,8 @@ public class ApplicationNode extends Node {
 	private Node argument;
 	
 	/**
-	 * Initializes a new Application, with the given function to apply and the
-	 * value to apply with.
+	 * Initializes a new ApplicationNode, with the given function to apply
+	 * and the value to apply with.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param function The function to apply in this application.
 	 * @param argument The argument to pass to the function.

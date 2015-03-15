@@ -32,7 +32,7 @@ public class Tuple extends Expression {
 	
 	/**
 	 * Gets the element at zero-based index {@code index} in this tuple.
-	 * @param index The index in the range <b>[0, {@link #getSize()}]</b>, of the element
+	 * @param index The index in the range <b>[0, {@link #getSize()} - 1]</b>, of the element
 	 * to get.
 	 * @return The element at index {@code index} in this tuple.
 	 */

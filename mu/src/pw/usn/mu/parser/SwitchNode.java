@@ -14,7 +14,7 @@ public class SwitchNode extends Node {
 	private SwitchBranchNode[] branches;
 	
 	/**
-	 * Initializes a new Switch expression with the given branches.
+	 * Initializes a new SwitchNode expression with the given branches.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param expression The expression to switch on.
 	 * @param branches The branches in this switch statement.

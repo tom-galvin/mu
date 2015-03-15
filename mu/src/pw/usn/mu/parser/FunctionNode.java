@@ -15,8 +15,8 @@ public class FunctionNode extends Node {
 	private Node body;
 	
 	/**
-	 * Initializes a new Function with the given argument identifier and function
-	 * body.
+	 * Initializes a new FunctionNode with the given argument identifier and
+	 * function body.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param argumentName The name of the function argument.
 	 * @param body The body of the function.

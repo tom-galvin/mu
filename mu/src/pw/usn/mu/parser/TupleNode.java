@@ -13,7 +13,7 @@ public class TupleNode extends Node {
 	private Node[] values;
 	
 	/**
-	 * Initializes a new untagged Tuple with the given {@code values}.
+	 * Initializes a new untagged TupleNode with the given {@code values}.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param values The values contained within this tuple.
 	 */
@@ -58,7 +58,7 @@ public class TupleNode extends Node {
 	public static Node parse(Parser parser) {
 		List<Node> expressions = new ArrayList<Node>(1);
 		do {
-			expressions.add(Node.parseBound(parser));
+			expressions.add(Node.parseTight(parser));
 		} while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.COMMA)));
 		if(expressions.size() == 1) {
 			return expressions.get(0);

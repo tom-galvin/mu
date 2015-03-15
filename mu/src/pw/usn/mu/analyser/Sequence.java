@@ -31,7 +31,7 @@ public class Sequence extends Expression {
 	
 	/**
 	 * Gets the element at zero-based index {@code index} in this sequence.
-	 * @param index The index in the range <b>[0, {@link #getLength()}]</b>, of the element
+	 * @param index The index in the range <b>[0, {@link #getLength()} - 1]</b>, of the element
 	 * to get.
 	 * @return The element at index {@code index} in this sequence.
 	 */

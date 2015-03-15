@@ -78,7 +78,7 @@ public class Function extends Expression {
 		
 		ResolutionContext functionContext = new ResolutionContext(context) {
 			@Override
-			public Reference resolve(IdentifierNode identifier) {
+			public Expression resolve(IdentifierNode identifier) {
 				if(identifier.isUnqualified() &&
 						identifier.getName().equals(node.getArgumentName())) {
 					return argument.newReference(identifier.getLocation());

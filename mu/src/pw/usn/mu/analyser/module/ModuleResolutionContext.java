@@ -1,6 +1,6 @@
 package pw.usn.mu.analyser.module;
 
-import pw.usn.mu.analyser.Reference;
+import pw.usn.mu.analyser.Expression;
 import pw.usn.mu.analyser.ResolutionContext;
 import pw.usn.mu.parser.IdentifierNode;
 
@@ -22,7 +22,7 @@ public class ModuleResolutionContext extends ResolutionContext {
 	}
 	
 	@Override
-	public Reference resolve(IdentifierNode identifier) {
+	public Expression resolve(IdentifierNode identifier) {
 		Module module = rootModule;
 		for(String moduleName : identifier.getModules()) {
 			if(module.containsSubmodule(moduleName)) {

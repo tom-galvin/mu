@@ -10,9 +10,9 @@ public class SwitchBranchNode extends Node {
 	private Node pattern, condition, result;
 	
 	/**
-	 * Initialize a new SwitchBranch with the given {@code pattern} to match, {@code condition} to
-	 * satisfy and {@code result} of the expression should the condition be satisfied for the given
-	 * pattern.
+	 * Initialize a new SwitchBranchNode with the given {@code pattern} to match, {@code
+	 * condition} to satisfy and {@code result} of the expression should the condition be
+	 * satisfied for the given pattern.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param pattern The pattern to be matched for this case.
 	 * @param condition The condition to satisfy.
@@ -26,14 +26,14 @@ public class SwitchBranchNode extends Node {
 	}
 	
 	/**
-	 * Initialize a new SwitchBranch with the given {@code pattern} to match and {@code result} of
-	 * the expression should the input match the given pattern.
+	 * Initialize a new SwitchBranch with the given {@code pattern} to match and {@code
+	 * result} of the expression should the input match the given pattern.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param pattern The pattern to be matched for this case.
 	 * @param result The result of this branch.
 	 */
 	public SwitchBranchNode(Location location, Node pattern, Node result) {
-		this(location, pattern, new IdentifierNode(location, "true"), result);
+		this(location, pattern, new LiteralSymbolNode(location, "true"), result);
 	}
 	
 	/**

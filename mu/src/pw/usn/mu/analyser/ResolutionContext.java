@@ -38,9 +38,10 @@ public abstract class ResolutionContext {
 	 * Resolves an identifier in the current context to a reference to the value
 	 * to which {@code identifier} refers.
 	 * @param identifier The identifier to resolve.
+	 * @param info Information about the identifier that is being resolved.
 	 * @return A reference to the value to which {@code identifier} refers to.
 	 */
-	public Reference resolve(IdentifierNode identifier) {
+	public Expression resolve(IdentifierNode identifier) {
 		if(identifier.isUnqualified()) {
 			if(parentContext != null) {
 				return parentContext.resolve(identifier);

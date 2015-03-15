@@ -14,7 +14,7 @@ public class LiteralSymbolNode extends Node {
 	private String value;
 	
 	/**
-	 * Initializes a new LiteralSymbol with the given value.
+	 * Initializes a new LiteralSymbolNode with the given value.
 	 * @param location The location of the AST node in a parsed input source.
 	 * @param value The value of the symbol represented by this literal.
 	 */

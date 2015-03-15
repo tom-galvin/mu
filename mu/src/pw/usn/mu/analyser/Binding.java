@@ -1,11 +1,7 @@
 package pw.usn.mu.analyser;
 
-import java.util.HashMap;
-import java.util.stream.Stream;
-
 import pw.usn.mu.analyser.closure.BindingClosureContext;
 import pw.usn.mu.analyser.closure.ClosureContext;
-import pw.usn.mu.analyser.closure.FunctionClosureContext;
 import pw.usn.mu.parser.BindingNode;
 import pw.usn.mu.parser.IdentifierNode;
 import pw.usn.mu.tokenizer.Location;
@@ -76,7 +72,7 @@ public class Binding extends Expression {
 		
 		ResolutionContext bindingContext = new ResolutionContext(context) {
 			@Override
-			public Reference resolve(IdentifierNode identifier) {
+			public Expression resolve(IdentifierNode identifier) {
 				if(identifier.isUnqualified() &&
 						identifier.getName().equals(node.getName())) {
 					return value.newReference(identifier.getLocation());

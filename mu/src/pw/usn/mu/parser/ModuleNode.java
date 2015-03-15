@@ -18,7 +18,7 @@ public class ModuleNode extends Node {
 	private Map<String, ModuleNode> submodules;
 	
 	/**
-	 * Initializes a new empty Module.
+	 * Initializes a new empty ModuleNode.
 	 * @param location The location of the AST node in a parsed input source.
 	 */
 	public ModuleNode(Location location) {

@@ -91,10 +91,11 @@ public class Reference extends Expression {
 	 * @param context The context in which {@code node} resides.
 	 * @param node The AST node to analyse.
 	 * @return A reference representing the same identifier as {@code node}, resolved into a
-	 * reference to a value.
+	 * reference to a value. This may return a {@link Reference} to a concrete value to which this
+	 * reference refers to, or a {@link FloatingReference} inside a pattern which will assign a
+	 * value to a matched expression.
 	 */
-	public static Reference analyse(ResolutionContext context, IdentifierNode node) {
-		Reference reference = context.resolve(node);
-		return reference;
+	public static Expression analyse(ResolutionContext context, IdentifierNode node) {
+		return context.resolve(node);
 	}
 }

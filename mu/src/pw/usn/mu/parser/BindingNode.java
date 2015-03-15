@@ -1,41 +1,37 @@
 package pw.usn.mu.parser;
 
-import pw.usn.mu.tokenizer.IdentifierToken;
 import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.SymbolTokenType;
-import pw.usn.mu.tokenizer.Token;
 
 /**
  * Represents a binding, wherein a value is bound to a name.
  */
 public class BindingNode extends Node {
-	private String name;
+	private Node bindingStructure;
 	private Node value;
 	private Node content;
 	
 	/**
-	 * Initializes a new Binding with the given name and value, and content which
+	 * Initializes a new BindingNode with the given name and value, and content which
 	 * can refer to the bound value by the given name.
 	 * @param location The location of the AST node in a parsed input source.
-	 * @param name The name of the newly-bound value.
+	 * @param name The structure of the decomposing binding.
 	 * @param value The value to bind.
 	 * @param content The content of the binding.
 	 */
-	public BindingNode(Location location, String name, Node value, Node content) {
+	public BindingNode(Location location, Node bindingStructure, Node value, Node content) {
 		super(location);
-		this.name = name;
+		this.bindingStructure = bindingStructure;
 		this.value = value;
 		this.content = content;
 	}
 
 	/**
-	 * Gets the name of the binding.
-	 * @return The name to which the value is bound in this binding. For example, if
-	 * the value {@code "hello"} is bound to the name {@code myIdentifier}, then this
-	 * function returns {@code "myIdentifier"}.
+	 * Gets the structure of the binding, describing how to decompose the value bound.
+	 * @return The structure of the binding.
 	 */
-	public String getName() {
-		return name;
+	public Node getBindingStructure() {
+		return bindingStructure;
 	}
 	
 	/**
@@ -50,8 +46,7 @@ public class BindingNode extends Node {
 	/**
 	 * Gets the content of this binding.
 	 * @return The content of this binding. Any expressions within {@code content} can
-	 * refer to the identifier returned by {@link BindingNode#getName() getName()} to access
-	 * the value bound to the name with this binding.
+	 * refer to the identifier(s) bound in this binding to access the values bound.
 	 */
 	public Node getContent() {
 		return content;
@@ -69,29 +64,26 @@ public class BindingNode extends Node {
 		 * it does this by cloning the parser enumerator state, which can be
 		 * returned to if there is no binding arrow (<-) after the potential binding target
 		 */
-		if(parser.test(token -> token instanceof IdentifierToken)) {
-			/* If the expression starts with an IdentifierToken, it *might* be the target
-			 * of a binding, so look ahead of the Identifier to check for it
-			 */
-			Parser lookaheadParser = parser.copyState(); // copy the parser state
-			Token identifierToken = lookaheadParser.current(1); // get the identifier token for error reporting
-			IdentifierNode identifier = IdentifierNode.parse(lookaheadParser);
-			if(identifier.isUnqualified()) {
-				/* OK, we've parsed the identifier. Now let's see if there's a <- after it */
-				if(lookaheadParser.accept(token -> token.isSymbolToken(SymbolTokenType.BIND))) {
+		try {
+			/* this *might* be the structure of a binding so create a lookahead parser to 
+			 * tentatively step ahead */
+			Parser lookaheadParser = parser.copyState(); /* copy the parser state */
+			Node bindingStructure = Node.parseBindNode(lookaheadParser);
+			/* OK, we've parsed the binding structure. Now let's see if there's a <- after it */
+			if(lookaheadParser.accept(token -> token.isSymbolToken(SymbolTokenType.BIND))) {
 				/* there is, so parse the binding */
-					Node value = Node.parse(lookaheadParser);
-					lookaheadParser.expect(token -> token.isSymbolToken(SymbolTokenType.SEPARATOR), "Expected semicolon to end binding.");
-					Node content = parse(lookaheadParser);
-					parser.fastForward(lookaheadParser); // bring the current parser up to the level of the look-ahead parser
-					return new BindingNode(identifier.getLocation(), identifier.getName(), value, content);
-				}
+				Node value = Node.parse(lookaheadParser);
+				lookaheadParser.expect(token -> token.isSymbolToken(SymbolTokenType.SEPARATOR), "Expected semicolon to end binding.");
+				Node content = parse(lookaheadParser);
+				parser.fastForward(lookaheadParser); // bring the current parser up to the level of the look-ahead parser
+				return new BindingNode(bindingStructure.getLocation(), bindingStructure, value, content);
 			} else {
-				/* binding target can't be qualified with module names so throw a ParserException */
-				throw new ParserException("Binding target must not be qualified.", identifierToken);
+				/* this looks like a valid binding but isn't so parse normally */
+				return Node.parse(parser);
 			}
-			/* this wasn't actually a binding, so discard the LookaheadParser and carry on as before */
+		} catch(ParserException e) {
+			/* not a binding structure so parse as normal */
+			return Node.parse(parser);
 		}
-		return Node.parse(parser);
 	}
 }

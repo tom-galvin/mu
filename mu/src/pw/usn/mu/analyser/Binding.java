@@ -1,7 +1,10 @@
 package pw.usn.mu.analyser;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import pw.usn.mu.analyser.closure.BindingClosureContext;
 import pw.usn.mu.analyser.closure.ClosureContext;
@@ -9,7 +12,9 @@ import pw.usn.mu.parser.BindingNode;
 import pw.usn.mu.parser.IdentifierNode;
 import pw.usn.mu.parser.Node;
 import pw.usn.mu.parser.binding.BindConsNode;
+import pw.usn.mu.parser.binding.BindValueNode;
 import pw.usn.mu.tokenizer.Location;
+
 
 /**
  * Represents the binding of a value in a mu program.
@@ -63,6 +68,14 @@ public class Binding extends Expression {
 		expression.liftClosures(bindingContext);
 		body.liftClosures(bindingContext);
 	}
+	
+	private static Expression createApplication(ResolutionContext context, Location location, String builtinName, Expression... arguments) {
+		Expression expr = context.resolve(new IdentifierNode(location, builtinName));
+		for(int i = 0; i < arguments.length; i++) {
+			expr = new Application(location, expr, arguments[i]);
+		}
+		return expr;
+	}
 
 	/**
 	 * Analyses the given {@code node} in the given context and creates an equivalent
@@ -73,32 +86,106 @@ public class Binding extends Expression {
 	 * node} but with all identifiers resolved into references to values.
 	 */
 	public static Binding analyse(ResolutionContext context, BindingNode node) {
-		Value value = new Value(node.getName());
-		Queue<Node> structureQueue = new ArrayDeque<Node>();
-		structureQueue.add(node.getBindingStructure());
-		while(!structureQueue.isEmpty()) {
-			Node structureNode = structureQueue.remove();
-			if(structureNode instanceof BindConsNode) {
-				BindConsNode consNode = (BindConsNode)structureNode;
-				consNode.
-			}
-		}
-		
-		ResolutionContext bindingContext = new ResolutionContext(context) {
-			@Override
-			public Expression resolve(IdentifierNode identifier) {
-				if(identifier.isUnqualified() &&
-						identifier.getName().equals(node.getName())) {
-					return value.newReference(identifier.getLocation());
-				} else {
-					return super.resolve(identifier);
+		if(node.getBindingStructure() instanceof BindValueNode) {
+			/* If the binding is just a single identifier we can just bind directly to it
+			 */
+			BindValueNode bindValueNode = (BindValueNode)node.getBindingStructure();
+			
+			// Create a value for this binding
+			Value value = new Value(bindValueNode.getValueName());
+			
+			// Simple resolution context
+			ResolutionContext bindingContext = new ResolutionContext(context) {
+				@Override
+				public Expression resolve(IdentifierNode identifier) {
+					String name = identifier.getName();
+					if(identifier.isUnqualified() &&
+							name.equals(value.getName())) {
+						return value.newReference(identifier.getLocation());
+					} else {
+						return super.resolve(identifier);
+					}
 				}
+			};
+			
+			return new Binding(node.getLocation(),
+					value,
+					Expression.analyse(bindingContext, node.getValue()),
+					Expression.analyse(bindingContext, node.getContent()));
+		} else {
+			// All identifiers bound
+			Map<String, Value> boundValues = new HashMap<String, Value>();
+			
+			/* Build a tree of bindings from the bottom up; we don't have pointers in
+			 * Java so we'll use a stack of builder functions instead.
+			 */
+			Stack<Function<Expression, Binding>> reverseTreeStack = new Stack<Function<Expression, Binding>>();
+			
+			/* This function recursively analyses the binding decomposition format and
+			 * creates the appropriate bindings.
+			 */
+			BiConsumer<Expression, Node> decomposeNode = (lowerExpr, structureNode) -> {
+				if(structureNode instanceof BindValueNode) {
+					BindValueNode valueNode = (BindValueNode)structureNode;
+					Value value = new Value(valueNode.getValueName());
+					boundValues.put(valueNode.getValueName(), value);
+					reverseTreeStack.push(expr ->
+						new Binding(node.getLocation(), value, lowerExpr, expr));
+				} else if(structureNode instanceof BindConsNode) {
+					BindConsNode consNode = (BindConsNode)structureNode;
+					Value valueHead = new Value(), valueTail = new Value();
+					reverseTreeStack.push(expr ->
+					new Binding(
+							node.getLocation(),
+							valueHead,
+							createApplication(
+									context,
+									consNode.getLocation(),
+									"__head",
+									lowerExpr),
+							new Binding(
+									node.getLocation(),
+									valueTail,
+									createApplication(
+											context,
+											consNode.getLocation(),
+											"__tail",
+											lowerExpr),
+									expr)));
+				}
+			};
+			
+			ResolutionContext bindingContext = new ResolutionContext(context) {
+				@Override
+				public Expression resolve(IdentifierNode identifier) {
+					String name = identifier.getName();
+					if(identifier.isUnqualified() &&
+							boundValues.containsKey(name)) {
+						return boundValues.get(name).newReference(identifier.getLocation());
+					} else {
+						return super.resolve(identifier);
+					}
+				}
+			};
+			
+			if(node.getValue() instanceof IdentifierNode) {
+				decomposeNode.accept(Expression.analyse(bindingContext, node), node.getBindingStructure());
+			} else {
+				Value initialValue = new Value();
+				reverseTreeStack.push(expr ->
+						new Binding(node.getLocation(),
+							initialValue,
+							Expression.analyse(bindingContext, node.getValue()),
+							expr));
+				decomposeNode.accept(initialValue.newReference(node.getLocation()), node.getBindingStructure());
 			}
-		};
-		
-		return new Binding(node.getLocation(),
-				value,
-				Expression.analyse(bindingContext, node.getValue()),
-				Expression.analyse(bindingContext, node.getContent()));
+			
+			Expression expression = Expression.analyse(bindingContext, node.getContent());
+			Binding binding = reverseTreeStack.pop().apply(expression);
+			while(!reverseTreeStack.isEmpty()) {
+				binding = reverseTreeStack.pop().apply(binding);
+			}
+			return binding;
+		}
 	}
 }

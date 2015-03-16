@@ -1,5 +1,6 @@
 package pw.usn.mu.parser;
 
+import pw.usn.mu.parser.binding.BindTupleNode;
 import pw.usn.mu.tokenizer.Location;
 import pw.usn.mu.tokenizer.SymbolTokenType;
 
@@ -68,7 +69,7 @@ public class BindingNode extends Node {
 			/* this *might* be the structure of a binding so create a lookahead parser to 
 			 * tentatively step ahead */
 			Parser lookaheadParser = parser.copyState(); /* copy the parser state */
-			Node bindingStructure = Node.parseBindNode(lookaheadParser);
+			Node bindingStructure = BindTupleNode.parse(lookaheadParser);
 			/* OK, we've parsed the binding structure. Now let's see if there's a <- after it */
 			if(lookaheadParser.accept(token -> token.isSymbolToken(SymbolTokenType.BIND))) {
 				/* there is, so parse the binding */

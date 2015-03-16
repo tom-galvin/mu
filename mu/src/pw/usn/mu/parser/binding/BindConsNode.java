@@ -51,7 +51,7 @@ public class BindConsNode extends Node {
 		Stack<Node> nodes = new Stack<Node>();
 		Stack<Location> locations = new Stack<Location>();
 		
-		nodes.push(Node.parseBindNode(parser));
+		nodes.push(BindValueNode.parse(parser));
 		while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.CONS))) {
 			locations.push(parser.current().getLocation());
 			nodes.push(BindValueNode.parse(parser));

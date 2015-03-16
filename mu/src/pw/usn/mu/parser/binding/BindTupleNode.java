@@ -50,7 +50,7 @@ public class BindTupleNode extends Node {
 	 */
 	public static Node parse(Parser parser) {
 		List<Node> nodes = new ArrayList<Node>();
-		nodes.add(Node.parseBindNode(parser));
+		nodes.add(BindConsNode.parse(parser));
 		while(parser.accept(token -> token.isSymbolToken(SymbolTokenType.COMMA))) {
 			nodes.add(BindConsNode.parse(parser));
 		}

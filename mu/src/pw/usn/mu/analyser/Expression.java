@@ -10,6 +10,7 @@ import pw.usn.mu.parser.LiteralStringNode;
 import pw.usn.mu.parser.LiteralSymbolNode;
 import pw.usn.mu.parser.Node;
 import pw.usn.mu.parser.SequenceNode;
+import pw.usn.mu.parser.SwitchNode;
 import pw.usn.mu.parser.TupleNode;
 import pw.usn.mu.tokenizer.Location;
 
@@ -89,6 +90,8 @@ public abstract class Expression {
 			return Tuple.analyse(context, (TupleNode)node);
 		} else if(node instanceof SequenceNode) {
 			return Sequence.analyse(context, (SequenceNode)node);
+		} else if(node instanceof SwitchNode) {
+			throw new AnalysisErrorException("Switch expressions are currently unsupported.", node.getLocation());
 		} else {
 			throw new RuntimeException("Unknown AST node type: " + node.getClass().getSimpleName());
 		}

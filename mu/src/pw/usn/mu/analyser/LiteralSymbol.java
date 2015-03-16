@@ -1,6 +1,9 @@
 package pw.usn.mu.analyser;
 
+import java.util.regex.Pattern;
+
 import pw.usn.mu.analyser.closure.ClosureContext;
+import pw.usn.mu.parser.LiteralStringNode;
 import pw.usn.mu.parser.LiteralSymbolNode;
 import pw.usn.mu.tokenizer.Location;
 
@@ -8,6 +11,7 @@ import pw.usn.mu.tokenizer.Location;
  * Represents an symbol literal in a mu program.
  */
 public class LiteralSymbol extends Expression {
+	private static Pattern simpleSymbol = Pattern.compile("[a-zA-Z0-9_]+");
 	private String value;
 	
 	/**

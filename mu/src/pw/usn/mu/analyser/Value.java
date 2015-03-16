@@ -1,18 +1,20 @@
 package pw.usn.mu.analyser;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-import pw.usn.mu.analyser.binding.BindStructure;
 import pw.usn.mu.tokenizer.Location;
 
 /**
  * Represents a value in a mu program. Note that this only represents the value
  * rather than containing the value itself.
  */
-public class Value implements BindStructure {
+public class Value {
 	private long id;
 	private static Random random = new Random();
 	private String name;
+	private List<Reference> references;
 	
 	/**
 	 * Initializes a new unique Value.
@@ -23,6 +25,7 @@ public class Value implements BindStructure {
 	public Value(String name) {
 		this.name = name;
 		this.id = random.nextLong();
+		this.references = new ArrayList<Reference>();
 	}
 
 	/**
@@ -57,7 +60,7 @@ public class Value implements BindStructure {
 	 * @param reference The reference to track.
 	 */
 	protected void addReference(Reference reference) {
-		/* No need for this yet. */
+		references.add(reference);
 	}
 	
 	/**
@@ -67,7 +70,15 @@ public class Value implements BindStructure {
 	 * @param reference The reference to drop.
 	 */
 	protected void removeReference(Reference reference) {
-		/* No need for this yet. */
+		references.remove(reference);
+	}
+	
+	/**
+	 * Gets the number of references to this value.
+	 * @return The number of references created that point to this value.
+	 */
+	public int getReferenceCount() {
+		return references.size();
 	}
 	
 	@Override
